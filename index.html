@@ -183,6 +183,8 @@ table.gt tr:hover td{background:var(--card-hover);}
 body.fs{--fz:13px;}body.fl{--fz:17px;}
 .ptx,.wtx,.fdm,.ifd,.cn2{font-size:var(--fz,14px);}
 @media print{body{background:#fff;color:#000;}#hdr,#nav,.wa,.fa,#ip,#splash,#inst-modal{display:none!important;}.ftm,.bt{color:#E8720C;}.pn{background:#E8720C;}}
+.dl-btn{display:block;background:var(--card);border:1px solid var(--border);color:var(--text);padding:12px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:8px;text-decoration:none;text-align:center;transition:all .2s;}
+.dl-btn:hover{border-color:var(--accent);background:var(--card-hover);}
 @media(min-width:768px){.cg{grid-template-columns:repeat(3,1fr);}.bg{grid-template-columns:repeat(4,1fr);}#main{max-width:768px;margin:0 auto;}.wa{bottom:24px;right:24px;}#nav{display:none;}}</style>
 </head>
 <body>
@@ -229,6 +231,8 @@ const F=[{"id": "f001", "cat": "limpeza-externa", "catName": "Limpeza Externa", 
 const GL=[["Lauril éter sulfato 27%", "3–20%", "Espuma e limpeza principal", "Lauril 70%, blend tensoativo", "R$ 10–25/L"], ["Lauril éter sulfato 70%", "1–8%", "Concentrado — espuma intensa", "Lauril 27% em maior qtd", "R$ 20–45/L"], ["Cocoamidopropil betaína 35%", "1–5%", "Suavidade e espuma cremosa", "Anfotérico similar", "R$ 15–35/L"], ["Amida 60 (dianolamida coco)", "1–5%", "Espessante e estabilizador de espuma", "Betaína em parte", "R$ 20–45/L"], ["Tensoativo não iônico NI-9", "1–8%", "Desengraxe e limpeza versátil", "Álcool graxo etoxilado", "R$ 15–40/L"], ["Ácido sulfônico LABSA", "2–10%", "Detergência aniônica forte — neutralizar antes de usar", "Lauril éter sulfato", "R$ 8–20/L"], ["Polissorbato 20 (Tween 20)", "1–5%", "Solubilizante de fragrâncias e óleos", "Polissorbato 80", "R$ 25–60/L"], ["Polissorbato 80 (Tween 80)", "1–5%", "Emulsionante e solubilizante", "Polissorbato 20", "R$ 25–60/L"], ["Quaternário de amônio (QUAT)", "0,1–0,5%", "Sanitizante de superfícies", "DDAC 50%", "R$ 30–80/L"], ["Água deionizada", "50–90%", "Base limpa — evita marcas minerais", "Água filtrada/desmineralizada", "R$ 1–5/L"], ["Butil glicol (2-butoxietanol)", "1–8%", "Solvente desengraxante principal", "Solvente glicólico, IPA", "R$ 25–60/L"], ["Álcool isopropílico (IPA) 99%", "2–30%", "Secagem rápida e higienização", "Álcool etílico", "R$ 15–40/L"], ["Álcool etílico 96%", "2–30%", "Evaporação rápida e higienização", "Álcool isopropílico", "R$ 12–35/L"], ["Propilenoglicol (PG)", "1–5%", "Fixação, umectância e espalhamento", "Glicerina, dipropilenoglicol", "R$ 15–40/L"], ["D-limoneno (solvente cítrico)", "2–15%", "Solvente natural — dissolve graxa com aroma cítrico", "Solvente alifático", "R$ 50–150/L"], ["Solvente alifático desodorizado", "5–20%", "Remove piche, cola e resíduos difíceis", "D-limoneno", "R$ 20–50/L"], ["Solvente glicólico (DPM)", "1–5%", "Solvente suave para fórmulas aquosas", "Butil glicol diluído", "R$ 30–70/L"], ["Soda líquida 50% (NaOH)", "1–10%", "Alcalinidade forte — saponifica gorduras", "Metassilicato + carbonato", "R$ 5–15/L"], ["Metassilicato de sódio", "1–6%", "Alcalinidade + limpeza pesada", "Carbonato + soda em parte", "R$ 8–25/kg"], ["Carbonato de sódio (barrilha)", "1–8%", "Alcalinizante econômico", "Metassilicato, bicarbonato", "R$ 4–12/kg"], ["Bicarbonato de sódio", "1–5%", "Alcalinizante suave e abrasivo leve", "Carbonato de sódio", "R$ 5–15/kg"], ["Tripolifosfato de sódio (STPP)", "1–5%", "Sequestra minerais da água dura", "EDTA, citrato de sódio", "R$ 8–20/kg"], ["TEA (trietanolamina)", "0,1–2%", "Neutralizante do carbomer e pH", "MEA, alcalinizante leve", "R$ 20–50/L"], ["Ácido cítrico anidro", "1–6%", "Remove minerais e ajusta pH ácido", "Ácido lático, sulfâmico", "R$ 10–35/kg"], ["Ácido fosfórico 85%", "3–10%", "Limpeza de alumínio e remoção de oxidação", "Ácido sulfâmico", "R$ 15–40/L"], ["Ácido sulfâmico", "1–5%", "Remoção de calcário e cimento", "Ácido cítrico, fosfórico", "R$ 15–40/kg"], ["Ácido lático 80%", "1–5%", "Remoção suave de minerais em vidros", "Ácido cítrico", "R$ 20–50/L"], ["Ácido glicólico 70%", "1–5%", "Limpeza de vidros e manchas minerais", "Ácido lático, cítrico", "R$ 30–80/L"], ["Cloreto de sódio (sal)", "0,5–2%", "Ajuste de viscosidade em tensoativos", "Espessante acrílico", "R$ 2–6/kg"], ["Carbomer (espessante acrílico)", "0,3–2%", "Gelificante para géis — ativar com TEA", "Goma xantana, HPMC", "R$ 60–200/kg"], ["Goma xantana", "0,1–1%", "Espessante natural e estabilizante", "Carbomer, goma guar", "R$ 40–120/kg"], ["CMC (carboximetilcelulose)", "0,5–2%", "Espessante e estabilizante econômico", "Goma xantana", "R$ 20–60/kg"], ["EDTA dissódico", "0,1–1%", "Sequestra minerais da água dura", "Tripolifosfato, citrato", "R$ 25–80/kg"], ["Gluconato de sódio", "0,1–0,5%", "Sequestrante e estabilizante alcalino", "EDTA", "R$ 20–60/kg"], ["Glicerina bidestilada 99%", "1–5%", "Umectância e toque suave", "Propilenoglicol, sorbitol", "R$ 8–25/L"], ["Sorbitol 70%", "1–5%", "Umectante e condicionante", "Glicerina", "R$ 10–30/L"], ["Silicone emulsionado 60%", "2–25%", "Brilho e acabamento — pneus e plásticos", "Silicone fluido emulsionado", "R$ 35–90/L"], ["Silicone fluido (PDMS) 350 cst", "1–10%", "Brilho leve e deslizamento", "Silicone emulsionado diluído", "R$ 40–100/L"], ["Silicone acabamento seco", "2–10%", "Acabamento matte sem oleosidade", "Silicone leve diluído", "R$ 50–120/L"], ["Cera de carnaúba emulsionada", "2–10%", "Brilho natural e proteção leve", "Cera sintética emulsionada", "R$ 35–120/L"], ["Cera sintética emulsionada", "2–8%", "Proteção e acabamento duradouro", "Cera de carnaúba", "R$ 30–80/L"], ["Resina acrílica emulsionada", "1–5%", "Fixação de acabamento em plásticos", "Resina PVA diluída", "R$ 20–60/L"], ["Polímero de brilho", "1–5%", "Toque liso e wet look na pintura", "Silicone + cera combinados", "R$ 40–100/L"], ["Fragrância concentrada", "0,2–12%", "Perfume e valor percebido do produto", "Outra essência compatível", "R$ 40–200/L"], ["Fixador de fragrância", "0,1–0,5%", "Prolonga a permanência do aroma", "Fixador isopropílico", "R$ 30–80/L"], ["Neutralizador de odores", "1–5%", "Elimina odores sem apenas mascarar", "Fragrância funcional", "R$ 30–120/L"], ["Conservante (Kathon, Euxyl)", "0,1–0,3%", "Conservação e vida útil do produto", "Blend conservante compatível", "R$ 40–150/L"], ["Inibidor de corrosão (BTA)", "0,1–1%", "Protege metais em fórmulas ácidas — obrigatório em limpa alumínio", "Inibidor específico do fornecedor", "R$ 40–150/L"], ["Hidrotropo (xilenosulfonato)", "1–5%", "Estabiliza e compatibiliza a fórmula", "Cumeno sulfonato de sódio", "R$ 15–40/L"], ["Pigmento / Corante líquido", "0,01–0,5%", "Cor do produto — usar com moderação", "Corante em pó compatível", "R$ 20–80/L"], ["Emulsão condicionante para couro", "2–10%", "Cuidado e acabamento em couro", "Emulsão similar compatível", "R$ 40–120/L"], ["D-Pantenol (provitamina B5)", "0,5–2%", "Condicionante e brilho para couro", "Vitamina E tocoferol", "R$ 60–150/L"]];
 const SU={"🛒 Marketplaces Online": [["MERCADO LIVRE — Insumos Químicos", "Nacional", "mercadolivre.com.br → buscar: lauril éter sulfato, silicone emulsionado, butil glicol"], ["SHOPEE — Matérias-Primas", "Nacional", "shopee.com.br → buscar: insumos para limpeza, silicone emulsionado"], ["AMAZON BRASIL", "Nacional", "amazon.com.br → matéria prima limpeza, tensoativo"], ["MAGALU / MAGAZINE LUIZA", "Nacional", "magazineluiza.com.br → produtos em quantidade"], ["ALIEXPRESS — Importados", "Internacional", "aliexpress.com → atenção ao prazo e documentação de importação"]], "🌐 Lojas Online": [["CASA DOS QUÍMICOS", "Indaiatuba-SP", "casadosquimicos.com.br | (19) 3199-8553"], ["CHEMAX", "Itapevi-SP", "chemax.com.br | (11) 4772-7272"], ["QUIMIDROL", "Joinville-SC", "quimidrol.com.br | 0800-644-6560"], ["BASEQUÍMICA", "Ribeirão Preto-SP", "basequimica.com | (16) 3636-5656"], ["ESSÊNCIA DO BRASIL", "São Paulo-SP", "essenciadobrasil.com.br — fragrâncias e insumos"], ["CASA DAS ESSÊNCIAS", "São Paulo-SP", "casadasessencias.com.br | (11) 3291-4444"], ["QUIMISA", "Santo André-SP", "quimisa.com.br | (11) 4993-4900"], ["CHEM4U", "São Paulo-SP", "chem4u.com.br"]], "🔴 Nordeste": [["UNIÃO QUÍMICA", "Recife-PE", "(81) 3471-1330 | WA: (81) 98177-1330"], ["CODOSSAL QUÍMICA", "Recife-PE", "(81) 3428-2228 | WA: (81) 99591-2395"], ["DISTRIBUIDORA OK", "Camaragibe-PE", "WA: (81) 99654-9775 | distribuidoraok.com"], ["VALENÇA QUÍMICA", "Recife-PE", "(81) 3448-0156"], ["MULTQUIL QUÍMICA", "João Pessoa-PB", "(83) 3235-5800 | WA: (83) 99118-0182"], ["DISTRIBUIDORA KLEAN", "Maceió-AL", "(82) 3036-1250 | distribuidoraklean.com.br"], ["SHOPPING DA LIMPEZA", "São Luís-MA", "(98) 2109-6582 | WA: (98) 99167-9967"], ["SULQUÍMICA", "Salvador-BA", "(71) 3341-2200 | sulquimica.com.br"], ["QUIMIBRAS NORDESTE", "Fortaleza-CE", "(85) 3272-1900"], ["PETROWAN", "Nordeste", "petrowan.com.br"], ["INFINITY NORDESTE", "Nordeste", "infinitynordeste.com.br"], ["DIAQUI QUÍMICA", "Natal-RN", "(84) 3201-5544"], ["INÓX QUÍMICA", "Aracaju-SE", "(79) 3226-0077"]], "🟢 Sudeste": [["CASA DOS QUÍMICOS", "Indaiatuba-SP", "(19) 3199-8553 | casadosquimicos.com.br"], ["BARBAREX", "Nova Odessa-SP", "(19) 3466-8888 | barbarex.com.br"], ["CHEMAX", "Itapevi-SP — referência nacional", "(11) 4772-7272 | chemax.com.br"], ["ROYAL MARCK", "Guarulhos-SP", "(11) 2413-1122 | royalmarck.com.br"], ["HIGICLEAR", "Campinas-SP", "0800-006-4747 | higiclear.com"], ["BASEQUÍMICA", "Ribeirão Preto-SP", "(16) 3636-5656 | basequimica.com"], ["QUIMISA", "Santo André-SP", "(11) 4993-4900 | quimisa.com.br"], ["MAPRIC", "São Paulo-SP — silicones", "(11) 3340-8000 | mapric.com.br"], ["ECOMASTER", "Uberaba-MG", "(34) 3311-2005 | ecomaster.ind.br"], ["MIX DAS ESSÊNCIAS", "Belo Horizonte-MG", "(31) 3274-8898 | mixdasessencias.com.br"], ["AROMALÂNDIA", "Serra-ES", "(27) 3252-6145 | aromalandia.com.br"], ["LANLIMP", "Queimados-RJ", "(24) 2106-9420 | lanlimp.com.br"], ["BRASQUIM", "Rio de Janeiro-RJ", "(21) 2233-5500 | brasquim.com.br"], ["ITAIQUARA QUÍMICA", "São Paulo-SP", "(11) 2063-4000 | itaiquara.com.br"]], "🔵 Sul": [["DIPA QUÍMICA", "Curitiba-PR", "(41) 3245-0777 | dipaquimica.com.br"], ["CLOROQUÍMICA", "Curitiba-PR", "(41) 3322-3844 | cloroquimica.com.br"], ["MULT DISTRIBUIDORA", "Pinhais-PR", "(41) 3033-5826 | multdistribuidora.com.br"], ["QUIMIDROL", "Joinville-SC — líder regional", "0800-644-6560 | quimidrol.com.br"], ["MACLER", "Timbó-SC", "(47) 3323-5012 | macler.com.br"], ["INDUPROL", "Laguna-SC — ANVISA", "induprol.com.br"], ["START QUÍMICA", "RS — certificada", "startquimica.com.br"], ["CASA DOS QUÍMICOS RS", "Flores da Cunha-RS", "(54) 3292-2941 | casadosquimicos.com.br"], ["DINAQUI", "Porto Alegre-RS", "(51) 3346-2200 | dinaqui.com.br"]], "🟡 Centro-Oeste": [["CASA DA QUÍMICA DF", "Taguatinga-DF", "casadaquimicadf.com.br"], ["TOMATEC", "Goiânia-GO", "tomatec-go.com.br"], ["GOIÁS QUÍMICA", "Goiânia-GO", "goiasquimica.com.br"], ["QUIMAGO", "Goiânia-GO", "(62) 3251-5100 | quimago.com.br"], ["POLIQUÍMICA", "Campo Grande-MS", "lojapoliquimica.com.br"], ["CENTROQUÍMICA", "Brasília-DF", "(61) 3563-0200"], ["MATO GROSSO QUÍMICA", "Cuiabá-MT", "(65) 3624-5500"]], "🟠 Norte": [["AM QUÍMICA", "Manaus-AM", "(92) 3018-0202 | amquimica.com.br"], ["PARQUÍMICA", "Ananindeua-PA", "WA: (91) 98119-9507 | parquimica.com.br"], ["RONDOQUÍMICA", "Porto Velho-RO", "rondoquimica.com.br"], ["CARAJÁS PRODUTOS", "Palmas-TO", "(63) 3213-1061 | WA: (63) 99939-1552"], ["ECONORTE", "Boa Vista-RR", "econorterr.com"], ["ACREQUIA", "Rio Branco-AC", "(68) 3224-1100"], ["AMAPÁ QUÍMICA", "Macapá-AP", "WA: (96) 98116-5500"]], "💡 Como buscar nos Marketplaces": [["TENSOATIVOS", "Mercado Livre / Shopee", "lauril éter sulfato 27% · coco betaína 35% · amida 60"], ["SOLVENTES", "Mercado Livre / Shopee", "butil glicol · álcool isopropílico 99% · d-limoneno"], ["ALCALINOS", "Mercado Livre / Shopee", "soda líquida 50% · metassilicato de sódio · carbonato barrilha"], ["ACABAMENTO", "Mercado Livre / Shopee", "silicone emulsionado · cera carnaúba emulsão · carbomer"], ["FRAGRÂNCIAS", "Mercado Livre / Shopee", "fragrância automotiva concentrada · essência carro novo"], ["ÁCIDOS", "Mercado Livre / Shopee", "ácido cítrico granel · ácido fosfórico 85% · sulfâmico"], ["EMBALAGENS", "Mercado Livre / Shopee", "frasco PEAD 1L atacado · bombona 5L · galão 20L PEAD"]]};
 const WA="558131963052";
+const LC=[{"id": "limpeza-lavanderia", "name": "Lavanderia", "icon": "🧺", "total": 10}, {"id": "limpeza-cozinha", "name": "Cozinha", "icon": "🍳", "total": 10}, {"id": "limpeza-banheiro", "name": "Banheiro", "icon": "🚿", "total": 8}, {"id": "limpeza-pisos", "name": "Pisos e Superfícies", "icon": "🏠", "total": 8}, {"id": "limpeza-multiuso", "name": "Multiuso e Vidros", "icon": "🪟", "total": 7}, {"id": "limpeza-industrial", "name": "Industrial", "icon": "🏭", "total": 7}];
+const LG=[{"id": "leg01", "num": "1", "title": "Os 3 Caminhos para Começar", "desc": "Revenda, marca própria terceirizada e fabricação própria — vantagens, limitações e como escolher para o seu momento atual.", "content": "Antes de qualquer documento, você precisa definir em qual modelo vai operar. Os três caminhos são: 1) Revenda — compra produtos prontos e revende, menor custo de entrada; 2) Marca própria terceirizada — você contrata um fabricante para produzir com sua marca; 3) Fabricação própria — você produz tudo, maior controle e margem."}, {"id": "leg02", "num": "2", "title": "Venda Antes de Fabricar", "desc": "Como validar o produto e começar a vender antes de montar toda a estrutura legal e de produção.", "content": "A sequência inteligente é: 1. Teste com sua rede; 2. Valide o preço e aceitação; 3. Com dinheiro em caixa, invista na formalização; 4. Abra o MEI ou ME; 5. Regularize conforme escala. Você pode vender para pessoas físicas como PF por um tempo curto enquanto regulariza."}, {"id": "leg03", "num": "3", "title": "O Que Você Pode Vender", "desc": "Saneantes Risco 1 e Risco 2 — o que cada categoria significa na prática e o que é mais indicado para iniciar.", "content": "Produtos de limpeza e automotivos são regulados pela ANVISA como saneantes. Risco 1 (sabão, detergente, shampoo, amaciante) exige apenas Notificação ANVISA. Risco 2 (alvejante com cloro, bactericidas) exige Registro ANVISA — mais complexo. Para iniciantes: comece pelo Risco 1."}, {"id": "leg04", "num": "4", "title": "Notificação ANVISA Passo a Passo", "desc": "11 passos detalhados para notificar seu produto no sistema Solicita — do cadastro ao protocolo.", "content": "1. Abra empresa (MEI/ME). 2. Acesse solicita.anvisa.gov.br. 3. Selecione Saneante Risco 1. 4. Preencha dados do produto (nome, composição, finalidade, modo de usar). 5. Informe dados do fabricante. 6. Adicione o rótulo. 7. Pague a GRU (taxa ANVISA). 8. Aguarde análise (30-60 dias úteis). 9. Receba o número de notificação. 10. Coloque o número no rótulo. 11. Renove periodicamente."}, {"id": "leg05", "num": "5", "title": "Rótulo Certo desde o Início", "desc": "Informações obrigatórias, erros mais comuns em fiscalização e checklist completo para não ser autuado.", "content": "Itens obrigatórios no rótulo: Nome do produto e marca, Número de notificação ANVISA, CNPJ e endereço do fabricante, Composição completa, Finalidade de uso, Modo de usar, Precauções e avisos de segurança, Volume ou peso, Lote e data de fabricação, Validade, Frases de segurança quando aplicável."}, {"id": "leg06", "num": "6", "title": "Responsável Técnico", "desc": "Quando você precisa de RT, quando não precisa e as opções para não contratar fixo no início.", "content": "RT é obrigatório para produtos de Risco 2, empresas com AFE e produção industrial. Para produtos de Risco 1 notificados por MEI em pequena escala, geralmente não é obrigatório. Alternativa: contratar RT por prestação de serviços (freela) por projeto ou mensalidade."}, {"id": "leg07", "num": "7", "title": "Abrindo Sua Empresa", "desc": "MEI, ME ou EPP — qual abrir, CNAEs com os códigos reais e passo a passo de abertura.", "content": "MEI: até R$81.000/ano, tributação fixa baixa — para quem está começando. ME: até R$360.000/ano, Simples Nacional — para quem já vende bem. CNAEs: 20.61-4/00 (fabricação de sabões), 20.62-2/00 (produtos de limpeza), 46.49-4/99 (comércio atacadista). Abrir MEI: portal.gov.br/mei em minutos, gratuito."}, {"id": "leg08", "num": "8", "title": "Licença Sanitária e AFE", "desc": "Quem precisa, como obter e o que varia por estado e município.", "content": "Licença Sanitária: emitida pela Vigilância Sanitária local, necessária para todo estabelecimento que produz ou armazena. AFE (Autorização de Funcionamento): emitida pela ANVISA, obrigatória para fabricantes de saneantes. Alvará de funcionamento: emitido pela prefeitura para toda empresa."}, {"id": "leg09", "num": "9", "title": "Checklist Final e Plano de 30 Dias", "desc": "3 checklists por modelo de negócio + plano de ação semana a semana para começar certo.", "content": "Semana 1: Valide o produto com 5-10 pessoas. Semana 2: Abra MEI/ME e defina os primeiros 3-5 produtos. Semana 3: Crie rótulos, monte fichas técnicas e inicie a notificação ANVISA. Semana 4: Lance oficialmente, divulgue e comece a vender com nota fiscal."}];
 const BO=[{"icon": "🏷️", "name": "Gerador de Rótulo", "desc": "Crie prompts para gerar rótulos com IA", "url": "https://gerador-rotulo.luverisgroup.com.br"}, {"icon": "💰", "name": "Precificação Automática", "desc": "Calcule custo e defina o preço ideal de venda", "url": "https://precificao-automatica.luverisgroup.com.br/"}, {"icon": "📊", "name": "Calculadora de Lucro", "desc": "Projete faturamento e metas financeiras", "url": "https://calculadora-lucro.luverisgroup.com.br/"}, {"icon": "📋", "name": "Gerador de Ficha Técnica", "desc": "Fichas técnicas em PDF profissional", "url": "https://gerador-ficha.luverisgroup.com.br/"}];
 const UP=[{"icon": "🌿", "title": "50 Fórmulas de Limpeza", "desc": "Sabão líquido, amaciante, detergente, cera para piso e mais 46 fórmulas profissionais.", "price": "R$ 9,90", "old": "R$ 47", "url": "https://pay.hotmart.com/G106306791H"}, {"icon": "⚖️", "title": "Guia de Legalização", "desc": "Passo a passo para vender legalmente — ANVISA, rótulo e abertura de empresa.", "price": "R$ 9,90", "old": "R$ 47", "url": "https://pay.hotmart.com/O106306505N"}, {"icon": "⚗️", "title": "Fórmula Exclusiva", "desc": "3 a 5 fórmulas desenvolvidas especialmente para o seu negócio com o formulador.", "price": "R$ 19,90", "old": "R$ 97", "url": "https://pay.hotmart.com/C106306412J"}];
 const CH=[{"id": "limpeza-externa", "name": "Limpeza Externa", "icon": "🧴", "total": 15}, {"id": "linha-pesada", "name": "Linha Pesada", "icon": "🚛", "total": 25}, {"id": "acabamento-brilho", "name": "Acabamento e Brilho", "icon": "✨", "total": 16}, {"id": "limpeza-interna", "name": "Limpeza Interna", "icon": "🚗", "total": 14}, {"id": "aromatizacao", "name": "Aromatização", "icon": "🌸", "total": 10}];
@@ -239,7 +243,7 @@ function parseAccess(){
   const p=new URLSearchParams(location.search);
   const t=(p.get('t')||p.get('access')||'').toUpperCase();
   const isAdmin=t==='ADMIN_FAP_2024'||t.includes('FULL');
-  return{base:t.length>0||isAdmin,limp:t.includes('LIMP')||isAdmin,leg:t.includes('LEG')||isAdmin,full:isAdmin,admin:isAdmin};
+  return{base:t.length>0||isAdmin,limp:t.includes('LIMP')||isAdmin,leg:t.includes('LEG')||isAdmin,full:isAdmin,admin:isAdmin,form:t.includes('FORM')||isAdmin};
 }
 let S={view:'home',cat:null,fid:null,q:'',favs:ls('fap_fav','[]'),viewed:ls('fap_viewed','[]'),fs:ls('fap_fs','"n"'),access:parseAccess(),instTab:'ios'};
 const $=id=>document.getElementById(id),m=()=>$('main');
@@ -260,6 +264,10 @@ function render(){
   else if(S.view==='favs')el.innerHTML=rFavs();
   else if(S.view==='gloss')el.innerHTML=rGloss();
   else if(S.view==='supp')el.innerHTML=rSupp();
+  else if(S.view==='limpeza')el.innerHTML=rLimpeza();
+  else if(S.view==='limpeza-cat')el.innerHTML=rLimpezaCat();
+  else if(S.view==='legalizacao')el.innerHTML=rLegalizacao();
+  else if(S.view==='legalizacao-cap')el.innerHTML=rLegalizacaoCap();
   bind();updProg();
 }
 
@@ -274,8 +282,12 @@ function rHome(){
   <div class="cc" data-a="view" data-v="supp"><span class="ci">📍</span><div class="cn">Fornecedores</div><div class="ck">Nacional + Online</div></div>`;
   const bons=BO.map(b=>`<a href="${b.url}" target="_blank" class="bc"><div class="bic">${b.icon}</div><div class="bn">${b.name}</div><div class="bd">${b.desc}</div><span class="bl">Acessar →</span></a>`).join('');
   const ups=UP.map(u=>{
-    if(S.access.admin)return`<div class="uc" style="border-color:var(--green)"><div class="ulock">${u.icon}</div><div class="uct"><div class="ut">${u.title}</div><div class="ud">${u.desc}</div><span style="font-size:11px;font-weight:700;color:var(--green)">✅ DESBLOQUEADO — Visão Admin</span></div><div class="up" style="color:var(--green)">ADMIN</div></div>`;
-    return`<div class="uc"><div class="ulock">${u.icon}</div><div class="uct"><div class="ut">${u.title}</div><div class="ud">${u.desc}</div><a href="${u.url}" target="_blank" class="ub">🔓 Desbloquear</a></div><div class="up"><span class="uo">${u.old}</span>${u.price}</div></div>`;
+    const k=u.url.includes('G106306791H')?'limp':u.url.includes('O106306505N')?'leg':'form';
+    const unlocked=S.access[k]||S.access.admin;
+    if(unlocked&&k==='limp')return`<div class="uc" style="border-color:var(--green);cursor:pointer" onclick="go('limpeza')"><div class="ulock">${u.icon}</div><div class="uct"><div class="ut">${u.title}</div><div class="ud">${u.desc}</div><span style="font-size:11px;font-weight:700;color:var(--green)">✅ DESBLOQUEADO — Toque para acessar</span></div><div class="up" style="color:var(--green)">→</div></div>`;
+    if(unlocked&&k==='leg')return`<div class="uc" style="border-color:var(--green);cursor:pointer" onclick="go('legalizacao')"><div class="ulock">${u.icon}</div><div class="uct"><div class="ut">${u.title}</div><div class="ud">${u.desc}</div><span style="font-size:11px;font-weight:700;color:var(--green)">✅ DESBLOQUEADO — Toque para acessar</span></div><div class="up" style="color:var(--green)">→</div></div>`;
+    if(unlocked)return`<div class="uc" style="border-color:var(--green)"><div class="ulock">${u.icon}</div><div class="uct"><div class="ut">${u.title}</div><div class="ud">${u.desc}</div><span style="font-size:11px;font-weight:700;color:var(--green)">✅ DESBLOQUEADO</span></div></div>`;
+    return`<div class="uc"><div class="ulock">${u.icon}</div><div class="uct"><div class="ut">${u.title}</div><div class="ud">${u.desc}</div><a href="${u.url}" target="_blank" class="ub">🔓 Desbloquear R$9,90</a></div><div class="up"><span class="uo">${u.old}</span>${u.price}</div></div>`;
   }).join('');
   return `
   <div class="wb">
@@ -299,10 +311,16 @@ function rHome(){
   <div class="bg">${bons}</div>
   <div class="sl">Desbloqueie Mais</div>
   <div class="ug">${ups}</div>
-  <div style="padding:20px 16px;text-align:center">
-    <button onclick="openInstModal()" style="background:rgba(232,114,12,.15);border:1px solid rgba(232,114,12,.3);color:var(--accent);padding:10px 20px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:12px;width:100%">
+  <div style="padding:20px 16px 8px">
+    <div class="sl" style="margin:0 0 12px">Downloads</div>
+    <a href="guia-autopro.pdf" download class="dl-btn">📥 Baixar Guia Fórmula Auto Pro (PDF)</a>
+    ${S.access.limp||S.access.admin?`<a href="guia-limpeza.pdf" download class="dl-btn">📥 Baixar 50 Fórmulas de Limpeza (PDF)</a>`:''}
+    ${S.access.leg||S.access.admin?`<a href="guia-legalizacao.pdf" download class="dl-btn">📥 Baixar Guia de Legalização (PDF)</a>`:''}
+    <button onclick="openInstModal()" style="background:rgba(232,114,12,.12);border:1px solid rgba(232,114,12,.25);color:var(--accent);padding:10px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;margin-top:8px;width:100%">
       📲 Instalar no Celular — Acesso Offline
     </button>
+  </div>
+  <div style="padding:8px 16px 20px;text-align:center">
     <div style="font-size:12px;color:var(--dim);line-height:1.7">João Silva — Engenheiro Químico · UFC<br>Suporte: WhatsApp (81) 3196-3052</div>
   </div>`;
 }
@@ -411,6 +429,8 @@ function handleA(e){
   else if(ac==='print')window.print();
   else if(ac==='share')shareF(a.dataset.id);
   else if(ac==='font'){const ss=['n','l','s'],i=ss.indexOf(S.fs),nx=ss[(i+1)%3];S.fs=nx;sv('fap_fs',JSON.stringify(nx));document.body.className=nx==='l'?'fl':nx==='s'?'fs':'';}
+  else if(ac==='limpeza-cat'){S.limpezaCat=a.dataset.cat;go('limpeza-cat');}
+  else if(ac==='leg-cap'){S.legCap=a.dataset.id;go('legalizacao-cap');}
   else if(ac==='inst-tab'){S.instTab=a.dataset.tab;renderInstModal();}
 }
 
@@ -451,6 +471,93 @@ let dP=null;
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();dP=e;setTimeout(()=>{const ip=$('ip');if(ip)ip.style.display='block';},5000);});
 function instApp(){$('ip').style.display='none';if(dP){dP.prompt();dP.userChoice.then(()=>{dP=null;});}}
 function disInst(){$('ip').style.display='none';}
+
+
+function rLimpeza(){
+  const unlocked=S.access.limp||S.access.admin;
+  if(!unlocked)return`<div class="es"><div class="ei">🔒</div><div class="et">Conteúdo Bloqueado</div><div class="ex">Adquira as 50 Fórmulas de Limpeza para acessar este conteúdo.</div><br><a href="https://pay.hotmart.com/G106306791H" target="_blank" class="ub" style="display:inline-block;padding:12px 24px;font-size:14px">🔓 Desbloquear por R$9,90</a></div>`;
+  return`<div class="lh">
+    <div class="bb" data-a="view" data-v="home">‹</div>
+    <div class="lt"><div class="lic">🌿</div><div class="ltx">50 Fórmulas de Limpeza</div><div class="lct">6 categorias · 50 fórmulas profissionais</div></div>
+  </div>
+  <div style="padding:12px 16px"><a href="guia-limpeza.pdf" download class="dl-btn">📥 Baixar PDF Completo</a></div>
+  <div class="fl">${LC.map(ch=>`
+    <div class="fi" data-a="limpeza-cat" data-cat="${ch.id}">
+      <div class="fic">
+        <div style="font-size:22px;margin-bottom:6px">${ch.icon}</div>
+        <div class="fit">Linha ${ch.name}</div>
+        <div class="fid">${ch.total} fórmulas profissionais prontas para produzir e vender</div>
+      </div>
+      <div class="far">›</div>
+    </div>`).join('')}
+  </div>`;
+}
+
+function rLimpezaCat(){
+  const cats={
+    'limpeza-lavanderia':{name:'Lavanderia',icon:'🧺',items:['Sabão Líquido Concentrado','Amaciante Concentrado','Amaciante Premium Concentrado 3x','Tira Manchas Multiação','Alvejante sem Cloro','Sabão em Pó Econômico','Goma de Passar Roupas','Sabão de Coco Líquido','Pré-lavagem com Enzimas','Amaciante Bebê Hipoalergênico']},
+    'limpeza-cozinha':{name:'Cozinha',icon:'🍳',items:['Detergente Neutro Concentrado','Desengordurante para Fogão e Forno','Limpa Inox para Cozinha','Detergente para Máquina de Lavar Louças','Limpa Micro-ondas','Desengordurante Cítrico Cozinha','Multiuso para Cozinha','Limpa Geladeira','Limpa Tábua e Utensílios','Limpador de Bancadas']},
+    'limpeza-banheiro':{name:'Banheiro',icon:'🚿',items:['Limpa Banheiro Multiação','Removedor de Calcário','Desinfetante para Banheiro','Limpa Box Anticalcário','Limpa Vaso Sanitário','Removedor de Mofo para Juntas','Limpa Azulejo e Rejunte','Sanitizante para Banheiro']},
+    'limpeza-pisos':{name:'Pisos e Superfícies',icon:'🏠',items:['Limpa Piso Neutro Perfumado','Cera Líquida para Pisos','Limpa Piso para Madeira','Encerante e Brilhante','Removedor de Cera','Limpa Pedra Natural','Limpa Porcelanato','Limpa Cerâmica Antisséptico']},
+    'limpeza-multiuso':{name:'Multiuso e Vidros',icon:'🪟',items:['Multiuso Concentrado','Limpa Vidros Doméstico','Limpa Carpete e Estofado','Limpa Móveis com Cera','Limpa Colchão Higienizador','Desodorizador de Ambientes','Limpa Telas e Eletrônicos']},
+    'limpeza-industrial':{name:'Industrial',icon:'🏭',items:['Desincrustante Alcalino Industrial','Desincrustante Ácido Industrial','Desengraxante Industrial Multiuso','Limpa Churrasqueira e Grelha','Neutralizador de Odores Industrial','Removedor de Cimento e Argamassa','Limpa Tanques e Reservatórios']},
+  };
+  const ch=cats[S.limpezaCat]||cats['limpeza-lavanderia'];
+  return`<div class="lh">
+    <div class="bb" data-a="view" data-v="limpeza">‹</div>
+    <div class="lt"><div class="lic">${ch.icon}</div><div class="ltx">Linha ${ch.name}</div><div class="lct">${ch.items.length} fórmulas — acesse o PDF para todas</div></div>
+  </div>
+  <div style="padding:12px 16px"><a href="guia-limpeza.pdf" download class="dl-btn">📥 Baixar PDF com todas as ${ch.items.length} fórmulas</a></div>
+  <div class="fl">${ch.items.map((item,i)=>`
+    <div class="fi" style="cursor:default">
+      <div class="fic">
+        <div style="font-size:10px;color:var(--accent);margin-bottom:3px;font-weight:700">Fórmula ${i+1} · ${ch.name}</div>
+        <div class="fit">${item}</div>
+        <div class="fid">Fórmula completa com ingredientes, modo de preparo, diluição e argumento de venda</div>
+      </div>
+      <div style="color:var(--dim);font-size:12px">PDF</div>
+    </div>`).join('')}
+  </div>`;
+}
+
+function rLegalizacao(){
+  const unlocked=S.access.leg||S.access.admin;
+  if(!unlocked)return`<div class="es"><div class="ei">🔒</div><div class="et">Conteúdo Bloqueado</div><div class="ex">Adquira o Guia de Legalização para acessar este conteúdo.</div><br><a href="https://pay.hotmart.com/O106306505N" target="_blank" class="ub" style="display:inline-block;padding:12px 24px;font-size:14px">🔓 Desbloquear por R$9,90</a></div>`;
+  return`<div class="lh">
+    <div class="bb" data-a="view" data-v="home">‹</div>
+    <div class="lt"><div class="lic">⚖️</div><div class="ltx">Guia de Legalização</div><div class="lct">9 capítulos · Venda do jeito certo</div></div>
+  </div>
+  <div style="padding:12px 16px"><a href="guia-legalizacao.pdf" download class="dl-btn">📥 Baixar PDF Completo do Guia</a></div>
+  <div class="fl">${LG.map(cap=>`
+    <div class="fi" data-a="leg-cap" data-id="${cap.id}">
+      <div class="fic">
+        <div style="font-size:10px;color:#3B82F6;font-weight:700;margin-bottom:3px">Capítulo ${cap.num}</div>
+        <div class="fit">${cap.title}</div>
+        <div class="fid">${cap.desc}</div>
+      </div>
+      <div class="far">›</div>
+    </div>`).join('')}
+  </div>`;
+}
+
+function rLegalizacaoCap(){
+  const cap=LG.find(x=>x.id===S.legCap)||LG[0];
+  return`<div class="lh">
+    <div class="bb" data-a="view" data-v="legalizacao">‹</div>
+    <div class="lt"><div style="font-size:10px;color:#3B82F6;font-weight:700">Capítulo ${cap.num}</div><div class="ltx">${cap.title}</div></div>
+  </div>
+  <div style="padding:20px 16px">
+    <div style="background:linear-gradient(135deg,var(--card),rgba(59,130,246,.06));border:1px solid var(--border);border-left:3px solid #3B82F6;border-radius:12px;padding:20px;margin-bottom:16px">
+      <div style="font-size:12px;color:#3B82F6;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">Resumo do Capítulo</div>
+      <div style="font-size:14px;color:var(--muted);line-height:1.6">${cap.desc}</div>
+    </div>
+    <div style="font-size:14px;line-height:1.8;color:var(--text)">${cap.content.replace(/\n/g,'<br>')}</div>
+    <div style="margin-top:20px;padding:16px;background:var(--card);border:1px solid var(--border);border-radius:12px;text-align:center">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:8px">Conteúdo completo disponível no PDF</div>
+      <a href="guia-legalizacao.pdf" download class="dl-btn" style="margin:0">📥 Baixar Guia Completo em PDF</a>
+    </div>
+  </div>`;
+}
 
 function init(){
   const fz=ls('fap_fs','"n"');if(fz!=='n')document.body.className=fz==='l'?'fl':'fs';
