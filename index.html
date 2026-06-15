@@ -18,7 +18,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-seri
 /* SPLASH */
 #splash{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;}
 .sp-logo{font-size:34px;font-weight:800;letter-spacing:-1px;background:linear-gradient(135deg,#E8720C,#FFB347);-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:fu .8s ease forwards;}
-.sp-sub{font-size:12px;color:var(--mut);letter-spacing:3px;text-transform:uppercase;animation:fu .8s .2s ease both;}
+.sp-sub{font-size:12px;color:var(--mut);letter-spacing:2px;text-transform:uppercase;animation:fu .8s .2s ease both;text-align:center;padding:0 32px;line-height:1.6;}
 .sp-bar{width:120px;height:3px;background:var(--brd);border-radius:2px;overflow:hidden;animation:fu .8s .4s ease both;}
 .sp-p{height:100%;width:0;background:linear-gradient(90deg,var(--acc),var(--acl));animation:lb 1.8s .5s ease forwards;}
 @keyframes lb{to{width:100%;}}@keyframes fu{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
@@ -362,9 +362,9 @@ function rHome(){
 
   const products=[
     {icon:'⚡',name:'Fórmula Auto Pro',sub:'80 fórmulas automotivas profissionais',v:'auto',key:'base',always:true},
-    {icon:'🌿',name:'50 Fórmulas de Limpeza',sub:'Lavanderia, cozinha, banheiro, pisos e mais',v:'limpeza',key:'limp'},
-    {icon:'⚖️',name:'Guia de Legalização',sub:'9 capítulos — venda do jeito certo',v:'legal',key:'leg'},
-    {icon:'⚗️',name:'Fórmula Exclusiva',sub:'Fórmulas personalizadas para o seu negócio',v:'exclusiva',key:'form'},
+    {icon:'🌿',name:'50 Fórmulas de Limpeza',sub:'Dobre seu catálogo. Venda amaciante, detergente, desinfetante e muito mais.',v:'limpeza',key:'limp'},
+    {icon:'⚖️',name:'Guia de Legalização',sub:'Venda sem medo. Tudo o que você precisa para estar na lei.',v:'legal',key:'leg'},
+    {icon:'⚗️',name:'Fórmula Exclusiva',sub:'Um Engenheiro Químico desenvolvendo sua fórmula. Exclusiva. Só sua.',v:'exclusiva',key:'form'},
   ];
 
   const pcards=products.map(p=>{
