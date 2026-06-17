@@ -281,8 +281,6 @@ function parseAccess(){
   const admin=t==='ADMIN_FAP_2024'||t.includes('FULL');
   return{base:t.length>0||admin,limp:t.includes('LIMP')||admin,leg:t.includes('LEG')||admin,form:t.includes('FORM')||admin,full:admin,admin};
 }
-;
-}
 
 let S={
   view:'home',
