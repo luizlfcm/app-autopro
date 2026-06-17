@@ -840,23 +840,22 @@ window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();dP=e;});
 
 // ── INIT ──────────────────────────────────────────────────────────
 
+
 function rNoAccess(msg){
-  return \`<div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center;background:var(--bg)">
-    <div style="font-size:56px;margin-bottom:16px">⚡</div>
-    <h1 style="font-size:22px;font-weight:800;background:linear-gradient(135deg,var(--acc),var(--acl));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px">Fórmula Auto Pro</h1>
-    <p style="font-size:13px;color:var(--mut);margin-bottom:32px;line-height:1.6;max-width:300px">\${msg||'O Guia que as Empresas Guardam a 7 Chaves.'}</p>
-    <div style="background:var(--card);border:1px solid var(--brd);border-radius:16px;padding:24px;max-width:340px;width:100%;margin-bottom:16px">
-      <div style="font-size:13px;color:var(--mut);margin-bottom:16px">Para acessar seu conteúdo, você precisa ter adquirido o produto.</div>
-      <a href="${HOTMART_URL}" target="_blank" style="display:block;background:linear-gradient(135deg,var(--acc),var(--acd));color:#fff;padding:14px 24px;border-radius:12px;font-size:15px;font-weight:700;text-decoration:none;margin-bottom:10px">
-        🔓 Adquirir Fórmula Auto Pro
-      </a>
-      <a href="https://wa.me/558131963052" target="_blank" style="display:block;background:var(--bg2);border:1px solid var(--brd);color:var(--mut);padding:11px 24px;border-radius:12px;font-size:13px;font-weight:600;text-decoration:none">
-        💬 Falar com suporte
-      </a>
-    </div>
-    <div style="font-size:11px;color:var(--dim)">João Silva — Engenheiro Químico · (81) 3196-3052</div>
-  </div>\`;
+  var m=msg||'O Guia que as Empresas Guardam a 7 Chaves.';
+  return '<div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center;background:var(--bg)">'
+    + '<div style="font-size:56px;margin-bottom:16px">⚡</div>'
+    + '<h1 style="font-size:22px;font-weight:800;background:linear-gradient(135deg,var(--acc),var(--acl));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px">Fórmula Auto Pro</h1>'
+    + '<p style="font-size:13px;color:var(--mut);margin-bottom:32px;line-height:1.6;max-width:300px">'+m+'</p>'
+    + '<div style="background:var(--card);border:1px solid var(--brd);border-radius:16px;padding:24px;max-width:340px;width:100%;margin-bottom:16px">'
+    + '<div style="font-size:13px;color:var(--mut);margin-bottom:16px">Para acessar seu conteúdo, você precisa ter adquirido o produto.</div>'
+    + '<a href="https://pay.hotmart.com/T106306252O" target="_blank" style="display:block;background:linear-gradient(135deg,var(--acc),var(--acd));color:#fff;padding:14px 24px;border-radius:12px;font-size:15px;font-weight:700;text-decoration:none;margin-bottom:10px">🔓 Adquirir Fórmula Auto Pro</a>'
+    + '<a href="https://wa.me/558131963052" target="_blank" style="display:block;background:var(--bg2);border:1px solid var(--brd);color:var(--mut);padding:11px 24px;border-radius:12px;font-size:13px;font-weight:600;text-decoration:none">💬 Falar com suporte</a>'
+    + '</div>'
+    + '<div style="font-size:11px;color:var(--dim)">João Silva — Engenheiro Químico · (81) 3196-3052</div>'
+    + '</div>';
 }
+
 
 async function init(){
   // Verificar acesso antes de mostrar qualquer coisa
