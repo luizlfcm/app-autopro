@@ -274,17 +274,47 @@ const WA="558131963052";
 function ls(k,d){try{return JSON.parse(localStorage.getItem(k)||d);}catch{return JSON.parse(d);}}
 function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
 
-function parseAccess(){
+
+async function parseAccess(){
   const p=new URLSearchParams(location.search);
   const t=(p.get('t')||p.get('access')||'').toUpperCase();
-  const admin=t==='ADMIN_FAP_2024'||t.includes('FULL');
-  return{
-    base:t.length>0||admin,
-    limp:t.includes('LIMP')||admin,
-    leg:t.includes('LEG')||admin,
-    form:t.includes('FORM')||admin,
-    admin
-  };
+
+  // Admin mode
+  if(t==='ADMIN_FAP_2024'||t.includes('FULL')){
+    return{base:true,limp:true,leg:true,form:true,admin:true,token:t};
+  }
+
+  // Sem token — bloqueado
+  if(!t){
+    return{base:false,limp:false,leg:false,form:false,admin:false,token:''};
+  }
+
+  // Verificar token no Upstash (read-only token é seguro no client)
+  try{
+    const resp=await fetch('https://brave-squid-149229.upstash.io/get/token:'+t,{
+      headers:{Authorization:'Bearer ggAAAAAAAkbtAAIgcDGlbiBG4BDcICZ-iYVZwvTqVeCyIYrwdkdqc77p0TNCsA'}
+    });
+    const data=await resp.json();
+    if(data.result){
+      const perms=JSON.parse(data.result);
+      return{
+        base:!!perms.base,
+        limp:!!perms.limp,
+        leg:!!perms.leg,
+        form:!!perms.form,
+        admin:false,
+        token:t
+      };
+    }
+    // Token não encontrado no Upstash
+    return{base:false,limp:false,leg:false,form:false,admin:false,token:t,invalid:true};
+  }catch(e){
+    // Erro de rede — fail open com base apenas
+    console.warn('Token check failed:',e);
+    return{base:true,limp:false,leg:false,form:false,admin:false,token:t};
+  }
+}
+;
 }
 
 let S={
@@ -361,7 +391,7 @@ function rHome(){
     :'<span class="pc-badge lk2">🔒 BLOQUEADO</span>';
 
   const products=[
-    {icon:'⚡',name:'Fórmula Auto Pro',sub:'80 fórmulas automotivas profissionais',v:'auto',key:'base',always:true},
+    {icon:'⚡',name:'Fórmula Auto Pro',sub:'80 fórmulas automotivas profissionais',v:'auto',key:'base'},
     {icon:'🌿',name:'50 Fórmulas de Limpeza',sub:'Dobre seu catálogo. Venda amaciante, detergente, desinfetante e muito mais.',v:'limpeza',key:'limp'},
     {icon:'⚖️',name:'Guia de Legalização',sub:'Venda sem medo. Tudo o que você precisa para estar na lei.',v:'legal',key:'leg'},
     {icon:'⚗️',name:'Fórmula Exclusiva',sub:'Um Engenheiro Químico desenvolvendo sua fórmula. Exclusiva. Só sua.',v:'exclusiva',key:'form'},
@@ -809,15 +839,45 @@ let dP=null;
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();dP=e;});
 
 // ── INIT ──────────────────────────────────────────────────────────
-function init(){
+
+function rNoAccess(msg){
+  return \`<div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center;background:var(--bg)">
+    <div style="font-size:56px;margin-bottom:16px">⚡</div>
+    <h1 style="font-size:22px;font-weight:800;background:linear-gradient(135deg,var(--acc),var(--acl));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px">Fórmula Auto Pro</h1>
+    <p style="font-size:13px;color:var(--mut);margin-bottom:32px;line-height:1.6;max-width:300px">\${msg||'O Guia que as Empresas Guardam a 7 Chaves.'}</p>
+    <div style="background:var(--card);border:1px solid var(--brd);border-radius:16px;padding:24px;max-width:340px;width:100%;margin-bottom:16px">
+      <div style="font-size:13px;color:var(--mut);margin-bottom:16px">Para acessar seu conteúdo, você precisa ter adquirido o produto.</div>
+      <a href="${HOTMART_URL}" target="_blank" style="display:block;background:linear-gradient(135deg,var(--acc),var(--acd));color:#fff;padding:14px 24px;border-radius:12px;font-size:15px;font-weight:700;text-decoration:none;margin-bottom:10px">
+        🔓 Adquirir Fórmula Auto Pro
+      </a>
+      <a href="https://wa.me/558131963052" target="_blank" style="display:block;background:var(--bg2);border:1px solid var(--brd);color:var(--mut);padding:11px 24px;border-radius:12px;font-size:13px;font-weight:600;text-decoration:none">
+        💬 Falar com suporte
+      </a>
+    </div>
+    <div style="font-size:11px;color:var(--dim)">João Silva — Engenheiro Químico · (81) 3196-3052</div>
+  </div>\`;
+}
+
+async function init(){
+  // Verificar acesso antes de mostrar qualquer coisa
+  S.access = await parseAccess();
+
   setTimeout(()=>{
     const sp=$('splash'),ap=$('app');
     if(sp){sp.style.opacity='0';sp.style.transition='opacity .5s';}
     setTimeout(()=>{
       if(sp)sp.style.display='none';
       if(ap)ap.removeAttribute('hidden');
+
+      // Se sem acesso base — mostrar tela de bloqueio e esconder nav
+      if(!S.access.base && !S.access.admin){
+        M().innerHTML=rNoAccess(S.access.invalid?'Seu acesso foi cancelado ou é inválido.':null);
+        document.getElementById('nav').style.display='none';
+        document.getElementById('hdr').style.display='none';
+        return;
+      }
+
       render();
-      // Show install on first visit if not standalone
       const standalone=window.matchMedia('(display-mode:standalone)').matches||navigator.standalone;
       if(!standalone&&!localStorage.getItem('fap_inst_shown')){
         setTimeout(openInst,1500);
@@ -835,6 +895,7 @@ function init(){
   $('hdr-inst-btn')?.addEventListener('click',openInst);
 }
 document.addEventListener('DOMContentLoaded',init);
+
 </script>
 </body>
 </html>
