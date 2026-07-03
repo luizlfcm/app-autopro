@@ -275,11 +275,21 @@ function ls(k,d){try{return JSON.parse(localStorage.getItem(k)||d);}catch{return
 function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
 
 
+// Permissões buscadas da API ao carregar a página
+const _t=(new URLSearchParams(location.search).get('t')||new URLSearchParams(location.search).get('access')||'').toUpperCase();
+let _permsPromise;
+if(!_t){
+  _permsPromise=Promise.resolve({base:false,limp:false,leg:false,form:false,admin:false});
+}else if(_t==='ADMIN_FAP_2024'||_t.includes('FULL')){
+  _permsPromise=Promise.resolve({base:true,limp:true,leg:true,form:true,admin:true});
+}else{
+  _permsPromise=fetch('/api/permissions?t='+encodeURIComponent(_t),{cache:'no-store'})
+    .then(r=>r.json())
+    .catch(()=>({base:true,limp:false,leg:false,form:false,admin:false}));
+}
+
 function parseAccess(){
-  const p=new URLSearchParams(location.search);
-  const t=(p.get('t')||p.get('access')||'').toUpperCase();
-  const admin=t==='ADMIN_FAP_2024'||t.includes('FULL');
-  return{base:t.length>0||admin,limp:t.includes('LIMP')||admin,leg:t.includes('LEG')||admin,form:t.includes('FORM')||admin,full:admin,admin};
+  return{base:false,limp:false,leg:false,form:false,admin:false};
 }
 
 let S={
@@ -809,20 +819,29 @@ window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();dP=e;});
 
 
 function init(){
-  S.access=parseAccess();
   setTimeout(()=>{
-    const sp=$('splash'),ap=$('app');
-    if(sp){sp.style.opacity='0';sp.style.transition='opacity .5s';}
-    setTimeout(()=>{
-      if(sp)sp.style.display='none';
-      if(ap)ap.removeAttribute('hidden');
-      render();
-      const standalone=window.matchMedia('(display-mode:standalone)').matches||navigator.standalone;
-      if(!standalone&&!localStorage.getItem('fap_inst_shown')){
-        setTimeout(openInst,1500);
-        localStorage.setItem('fap_inst_shown','1');
-      }
-    },520);
+    _permsPromise.then(perms=>{
+      S.access={
+        base: perms.base||false,
+        limp: perms.limp||false,
+        leg:  perms.leg ||false,
+        form: perms.form||false,
+        full: perms.admin||false,
+        admin:perms.admin||false
+      };
+      const sp=$('splash'),ap=$('app');
+      if(sp){sp.style.opacity='0';sp.style.transition='opacity .5s';}
+      setTimeout(()=>{
+        if(sp)sp.style.display='none';
+        if(ap)ap.removeAttribute('hidden');
+        render();
+        const standalone=window.matchMedia('(display-mode:standalone)').matches||navigator.standalone;
+        if(!standalone&&!localStorage.getItem('fap_inst_shown')){
+          setTimeout(openInst,1500);
+          localStorage.setItem('fap_inst_shown','1');
+        }
+      },520);
+    });
   },2000);
   document.querySelectorAll('.ni').forEach(el=>{
     el.addEventListener('click',()=>{const v=el.dataset.v;if(v)go(v);});
