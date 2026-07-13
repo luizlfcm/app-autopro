@@ -899,8 +899,11 @@ window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();dP=e;});
 
 
 function init(){
+  // Timeout de segurança — nunca fica preso no splash
+  const _timeout=new Promise(resolve=>setTimeout(()=>resolve(null),4000));
+  
   setTimeout(()=>{
-    _authPromise.then(auth=>{
+    Promise.race([_authPromise,_timeout]).then(auth=>{
       if(!auth){ _showLogin(); return; }
       S.access={
         base: auth.base||false,
