@@ -1,7 +1,7 @@
 const UPSTASH_URL   = 'https://brave-squid-149229.upstash.io';
 const UPSTASH_TOKEN = 'ggAAAAAAAkbtAAIgcDGlbiBG4BDcICZ-iYVZwvTqVeCyIYrwdkdqc77p0TNCsA';
 const ADMIN_TOKEN   = 'ADMIN_FAP_2024';
-const HOTMART_URL   = 'https://pay.hotmart.com/T106306252O';
+const HOTMART_URL   = 'https://pay.hotmart.com/T106306252O?checkoutMode=10';
 const WA_URL        = 'https://wa.me/558131963052';
 
 const BLOCKED_PAGE = `<!DOCTYPE html>
@@ -22,7 +22,6 @@ const BLOCKED_PAGE = `<!DOCTYPE html>
   .btn-primary{background:linear-gradient(135deg,#E8720C,#c45e08);color:#fff}
   .btn-wa{background:#25D366;color:#fff}
   .btn-sec{background:#1a1f26;border:1px solid #2a2f38;color:#8b95a1}
-  .divider{font-size:11px;color:#3a3f48;margin:4px 0 10px}
 </style>
 </head>
 <body>
@@ -31,26 +30,25 @@ const BLOCKED_PAGE = `<!DOCTYPE html>
   <h1>Acesso não encontrado</h1>
   <p>Não encontramos um acesso ativo associado a este link.<br>Se você já adquiriu o produto, entre em contato com o suporte.</p>
   <a href="${WA_URL}?text=Ola!+Comprei+o+Formula+Auto+Pro+mas+nao+consigo+acessar." class="btn btn-wa">💬 Falar com suporte</a>
-  <div class="divider">ou</div>
+  <div style="font-size:11px;color:#3a3f48;margin:4px 0 10px">ou</div>
   <a href="${HOTMART_URL}" class="btn btn-primary">🔓 Adquirir agora</a>
-  <a href="javascript:history.back()" class="btn btn-sec">← Voltar</a>
 </div>
 </body>
 </html>`;
 
 export default async function middleware(request) {
-  const url = new URL(request.url);
+  const url  = new URL(request.url);
   const path = url.pathname;
   const token = (url.searchParams.get('t') || url.searchParams.get('access') || '').toUpperCase();
 
-  // Deixar passar arquivos estáticos
+  // Deixar passar arquivos estáticos e API
   if (
-    path.endsWith('.pdf') ||
-    path.endsWith('.json') ||
-    path.endsWith('.png') ||
-    path.endsWith('.ico') ||
-    path.endsWith('.js') ||
-    path.startsWith('/api/')
+    path.startsWith('/api/') ||
+    path.endsWith('.pdf')    ||
+    path.endsWith('.json')   ||
+    path.endsWith('.png')    ||
+    path.endsWith('.ico')    ||
+    path.endsWith('.js')
   ) {
     return;
   }
@@ -60,15 +58,12 @@ export default async function middleware(request) {
     return;
   }
 
-  // Sem token — mostra página de bloqueio
+  // Sem token — deixa passar (app mostra tela de login por email)
   if (!token) {
-    return new Response(BLOCKED_PAGE, {
-      status: 403,
-      headers: { 'Content-Type': 'text/html;charset=UTF-8' }
-    });
+    return;
   }
 
-  // Verificar token no Upstash
+  // Com token — valida no Upstash (backward compat para links existentes)
   try {
     const resp = await fetch(`${UPSTASH_URL}/get/token:${token}`, {
       headers: { Authorization: `Bearer ${UPSTASH_TOKEN}` },
@@ -77,6 +72,7 @@ export default async function middleware(request) {
     const data = await resp.json();
 
     if (!data.result) {
+      // Token inválido — mostra página de bloqueio
       return new Response(BLOCKED_PAGE, {
         status: 403,
         headers: { 'Content-Type': 'text/html;charset=UTF-8' }
@@ -84,8 +80,8 @@ export default async function middleware(request) {
     }
 
     const perms = JSON.parse(data.result);
-
-    if (!perms.base) {
+    if (!perms.base && !perms.limp && !perms.leg && !perms.form) {
+      // Token revogado — mostra página de bloqueio
       return new Response(BLOCKED_PAGE, {
         status: 403,
         headers: { 'Content-Type': 'text/html;charset=UTF-8' }

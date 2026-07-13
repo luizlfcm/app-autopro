@@ -275,21 +275,98 @@ function ls(k,d){try{return JSON.parse(localStorage.getItem(k)||d);}catch{return
 function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
 
 
-// Permissões buscadas da API ao carregar a página
-const _t=(new URLSearchParams(location.search).get('t')||new URLSearchParams(location.search).get('access')||'').toUpperCase();
-let _permsPromise;
-if(!_t){
-  _permsPromise=Promise.resolve({base:false,limp:false,leg:false,form:false,admin:false});
-}else if(_t==='ADMIN_FAP_2024'||_t.includes('FULL')){
-  _permsPromise=Promise.resolve({base:true,limp:true,leg:true,form:true,admin:true});
-}else{
-  _permsPromise=fetch('/api/permissions?t='+encodeURIComponent(_t),{cache:'no-store'})
-    .then(r=>r.json())
-    .catch(()=>({base:true,limp:false,leg:false,form:false,admin:false}));
+// ── Auth por email ──────────────────────────────────────────────
+function parseAccess(){ return{base:false,limp:false,leg:false,form:false,admin:false}; }
+
+const _urlToken=(new URLSearchParams(location.search).get('t')||'').toUpperCase();
+
+const _authPromise=(async()=>{
+  // Admin bypass
+  if(_urlToken==='ADMIN_FAP_2024'||_urlToken.includes('FULL'))
+    return{base:true,limp:true,leg:true,form:true,admin:true};
+
+  // Email salvo no dispositivo
+  const savedEmail=localStorage.getItem('fap_email');
+  if(savedEmail){
+    try{
+      const r=await fetch('/api/login?email='+encodeURIComponent(savedEmail),{cache:'no-store'});
+      const d=await r.json();
+      if(d.success) return{...d.permissions,admin:false};
+      // Acesso revogado — remove email salvo
+      localStorage.removeItem('fap_email');
+    }catch(e){ return{base:true,limp:false,leg:false,form:false,admin:false}; }
+  }
+
+  // Token na URL (backward compat — links existentes continuam funcionando)
+  if(_urlToken){
+    try{
+      const r=await fetch('/api/permissions?t='+encodeURIComponent(_urlToken),{cache:'no-store'});
+      const d=await r.json();
+      if(d.base||d.limp||d.leg||d.form) return{...d,admin:false};
+    }catch(e){}
+  }
+
+  return null; // Mostrar tela de login
+})();
+
+// Tela de login
+function _showLogin(){
+  const sp=$('splash');
+  if(sp)sp.style.display='none';
+  const el=document.createElement('div');
+  el.id='fap-login';
+  el.innerHTML=\`
+    <div style="min-height:100vh;background:#080B0F;display:flex;align-items:center;justify-content:center;padding:24px;font-family:system-ui,sans-serif">
+      <div style="background:#111418;border:1px solid #21262D;border-radius:20px;padding:32px 24px;max-width:360px;width:100%;text-align:center">
+        <div style="font-size:52px;margin-bottom:12px">⚡</div>
+        <h1 style="font-size:22px;font-weight:800;color:#F0F6FC;margin-bottom:8px">Fórmula Auto Pro</h1>
+        <p style="font-size:14px;color:#8B949E;margin-bottom:24px;line-height:1.6">Digite o email que você usou na compra para acessar</p>
+        <input id="fap-email-input" type="email" placeholder="seu@email.com" autocomplete="email"
+          style="width:100%;padding:14px;border-radius:10px;border:1px solid #21262D;background:#0D1117;color:#F0F6FC;font-size:15px;margin-bottom:12px;outline:none;-webkit-appearance:none"/>
+        <button onclick="_doLogin()"
+          style="width:100%;padding:16px;border-radius:12px;background:linear-gradient(135deg,#E8720C,#C45E08);color:#fff;font-size:15px;font-weight:700;border:none;cursor:pointer;margin-bottom:8px">
+          Acessar →
+        </button>
+        <p id="fap-login-err" style="font-size:12px;color:#F85149;margin-top:8px;display:none;min-height:18px"></p>
+        <p style="font-size:11px;color:#484F58;margin-top:20px">
+          Problemas? <a href="https://wa.me/558131963052" style="color:#E8720C;text-decoration:none">Fale com o suporte</a>
+        </p>
+      </div>
+    </div>
+  \`;
+  document.body.appendChild(el);
+  setTimeout(()=>document.getElementById('fap-email-input')?.focus(),300);
 }
 
-function parseAccess(){
-  return{base:false,limp:false,leg:false,form:false,admin:false};
+async function _doLogin(){
+  const input=document.getElementById('fap-email-input');
+  const errEl=document.getElementById('fap-login-err');
+  const btn=document.querySelector('#fap-login button');
+  const email=(input?.value||'').trim().toLowerCase();
+  if(!email){ errEl.textContent='Digite seu email'; errEl.style.display='block'; return; }
+  btn.textContent='Verificando...'; btn.disabled=true; errEl.style.display='none';
+  try{
+    const r=await fetch('/api/login?email='+encodeURIComponent(email),{cache:'no-store'});
+    const d=await r.json();
+    if(d.success){
+      localStorage.setItem('fap_email',email);
+      S.access={base:d.permissions.base||false,limp:d.permissions.limp||false,leg:d.permissions.leg||false,form:d.permissions.form||false,full:false,admin:false};
+      document.getElementById('fap-login')?.remove();
+      const ap=$('app');
+      if(ap)ap.removeAttribute('hidden');
+      render();
+    }else{
+      errEl.textContent=d.error||'Email não encontrado';
+      errEl.style.display='block';
+      btn.textContent='Acessar →';
+      btn.disabled=false;
+    }
+  }catch(e){
+    errEl.textContent='Erro de conexão. Tente novamente.';
+    errEl.style.display='block';
+    btn.textContent='Acessar →';
+    btn.disabled=false;
+  }
 }
 
 let S={
@@ -499,7 +576,10 @@ function rForm(db,id,backView,backCat,parentView){
   const fv=isFav(f.id);
   const tbl=`<table class="ft"><thead><tr><th>Ingrediente</th><th>Quantidade</th></tr></thead><tbody>${(f.formula||[]).map(([i,q])=>`<tr><td>${i}</td><td>${q}</td></tr>`).join('')}</tbody></table>`;
   const ift=`<div class="ifl">${(f.ingFunc||[]).map(([n,d])=>`<div class="ifi"><div class="ifn">${n}</div><div class="ifd">${d}</div></div>`).join('')}</div>`;
-  const prep=`<div class="pl">${(f.prep||[]).map((s,i)=>`<div class="ps"><div class="pn">${i+1}</div><div class="ptx">${s}</div></div>`).join('')}</div>`;
+  // Nota técnica — aparece se a fórmula tem cloreto de sódio ou "água p/ completar"
+const _hasNota=(f.formula||f.ing||[]).some(i=>Array.isArray(i)?(i[0]||'').toLowerCase().includes('cloreto'):(i.n||i.nome||'').toLowerCase().includes('cloreto'));
+const _nota=_hasNota?`<div style="background:rgba(232,114,12,.08);border:1px solid rgba(232,114,12,.2);border-radius:10px;padding:12px;margin-bottom:14px;font-size:12px;color:var(--mut);line-height:1.6">💡 <strong style="color:var(--acc)">Nota técnica:</strong> A quantidade de água na lista de ingredientes pode ser diferente do 1º passo do preparo. Isso é intencional — parte da água é reservada para dissolver ingredientes sólidos (como cloreto de sódio) antes de adicionar ao tanque. O total sempre fecha na quantidade indicada na fórmula.</div>`:'';
+const prep=`<div class="pl">${_nota}${(f.prep||[]).map((s,i)=>`<div class="ps"><div class="pn">${i+1}</div><div class="ptx">${s}</div></div>`).join('')}</div>`;
   const dil=`<table class="dt"><thead><tr><th>Situação</th><th>Diluição</th><th>Exemplo</th></tr></thead><tbody>${(f.dil||[]).map(([s,r,e])=>`<tr><td>${s}</td><td><span class="dr">${r}</span></td><td><span class="de">${e}</span></td></tr>`).join('')}</tbody></table>`;
   const caut=(f.caut||[]).map(c=>`<div class="wi"><div class="wic">⚠️</div><div class="wtx">${c}</div></div>`).join('');
   const errs=(f.err||[]).map(e=>`<div class="wi"><div class="wic">❌</div><div class="wtx">${e}</div></div>`).join('');
@@ -820,14 +900,15 @@ window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();dP=e;});
 
 function init(){
   setTimeout(()=>{
-    _permsPromise.then(perms=>{
+    _authPromise.then(auth=>{
+      if(!auth){ _showLogin(); return; }
       S.access={
-        base: perms.base||false,
-        limp: perms.limp||false,
-        leg:  perms.leg ||false,
-        form: perms.form||false,
-        full: perms.admin||false,
-        admin:perms.admin||false
+        base: auth.base||false,
+        limp: auth.limp||false,
+        leg:  auth.leg ||false,
+        form: auth.form||false,
+        full: auth.admin||false,
+        admin:auth.admin||false
       };
       const sp=$('splash'),ap=$('app');
       if(sp){sp.style.opacity='0';sp.style.transition='opacity .5s';}
