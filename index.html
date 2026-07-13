@@ -277,11 +277,538 @@ function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
 
 function parseAccess(){
   const p=new URLSearchParams(location.search);
-  const t=(p.get('t')||p.get('access')||localStorage.getItem('fap_token')||'').toUpperCase();
-  if(t&&t!=='NULL') localStorage.setItem('fap_token',t);
+  const raw=p.get('t')||p.get('access')||'';
+  if(raw) localStorage.setItem('fap_token',raw);
+  const t=(raw||localStorage.getItem('fap_token')||'').toUpperCase();
   const admin=t==='ADMIN_FAP_2024'||t.includes('FULL');
   return{base:t.length>0||admin,limp:t.includes('LIMP')||admin,leg:t.includes('LEG')||admin,form:t.includes('FORM')||admin,full:admin,admin};
 }
+
+let S={
+  view:'home',
+  // navigation state
+  autoCat:null, autoForm:null,
+  limpCat:null, limpForm:null,
+  legCap:null,
+  // search
+  searchQ:'',
+  // prefs
+  favs:ls('fap_fav','[]'),
+  viewed:ls('fap_viewed','[]'),
+  access:parseAccess(),
+  instTab:'ios',
+};
+
+const $=id=>document.getElementById(id);
+const M=()=>$('main');
+
+function go(view,extra={}){
+  Object.assign(S,{view},extra);
+  render();
+  window.scrollTo(0,0);
+  updNav();
+}
+function updNav(){
+  document.querySelectorAll('.ni').forEach(el=>
+    el.classList.toggle('on', el.dataset.v===S.view));
+}
+function isFav(id){return S.favs.includes(id);}
+function isVd(id){return S.viewed.includes(id);}
+function togFav(id,e){
+  if(e){e.stopPropagation();}
+  S.favs=isFav(id)?S.favs.filter(x=>x!==id):[...S.favs,id];
+  sv('fap_fav',S.favs);
+  render();
+}
+function markVd(id){
+  if(!isVd(id)){S.viewed=[...S.viewed,id];sv('fap_viewed',S.viewed);}
+}
+function updProg(){
+  const t=AF.length+LF.length,d=S.viewed.length,pf=$('pf');
+  if(pf)pf.style.width=(t>0?d/t*100:0)+'%';
+}
+
+// ── RENDER ─────────────────────────────────────────────────────────
+function render(){
+  const el=M();
+  switch(S.view){
+    case'home':      el.innerHTML=rHome();break;
+    case'auto':      el.innerHTML=rAuto();break;
+    case'auto-cat':  el.innerHTML=rAutoCat();break;
+    case'auto-form': el.innerHTML=rForm(AF,S.autoForm,'auto-cat',S.autoCat,'auto');break;
+    case'limpeza':   el.innerHTML=rLimpeza();break;
+    case'limp-cat':  el.innerHTML=rLimpCat();break;
+    case'limp-form': el.innerHTML=rForm(LF,S.limpForm,'limp-cat',S.limpCat,'limpeza');break;
+    case'legal':     el.innerHTML=rLegal();break;
+    case'legal-cap': el.innerHTML=rLegalCap();break;
+    case'exclusiva': el.innerHTML=rExclusiva();break;
+    case'search':    el.innerHTML=rSearchShell();bindSearch();break;
+    case'favs':      el.innerHTML=rFavs();break;
+    case'gloss':     el.innerHTML=rGloss();break;
+    case'supp':      el.innerHTML=rSupp();break;
+  }
+  bindCommon();updProg();
+}
+
+// ── HOME ───────────────────────────────────────────────────────────
+function rHome(){
+  const A=S.access;
+  const badge=(unlocked,locked)=>unlocked
+    ?'<span class="pc-badge unl">✓ INCLUSO</span>'
+    :'<span class="pc-badge lk2">🔒 BLOQUEADO</span>';
+
+  const products=[
+    {icon:'⚡',name:'Fórmula Auto Pro',sub:'80 fórmulas automotivas profissionais',v:'auto',key:'base',always:true},
+    {icon:'🌿',name:'50 Fórmulas de Limpeza',sub:'Dobre seu catálogo. Venda amaciante, detergente, desinfetante e muito mais.',v:'limpeza',key:'limp'},
+    {icon:'⚖️',name:'Guia de Legalização',sub:'Venda sem medo. Tudo o que você precisa para estar na lei.',v:'legal',key:'leg'},
+    {icon:'⚗️',name:'Fórmula Exclusiva',sub:'Um Engenheiro Químico desenvolvendo sua fórmula. Exclusiva. Só sua.',v:'exclusiva',key:'form'},
+  ];
+
+  const pcards=products.map(p=>{
+    const unl=p.always||A[p.key]||A.admin;
+    return`<div class="pc${unl?'':' lk'}" data-action="${unl?'go':'upsell'}" data-v="${p.v}" data-key="${p.key}">
+      <div class="pc-icon">${p.icon}</div>
+      <div class="pc-body">
+        <div class="pc-name">${p.name}</div>
+        <div class="pc-sub">${p.sub}</div>
+      </div>
+      ${badge(unl)}
+    </div>`;
+  }).join('');
+
+  const utils=`
+  <div class="uc" data-action="go" data-v="gloss"><div class="uc-icon">📚</div><div class="uc-name">Glossário</div><div class="uc-sub">${GL.length} insumos com preço</div></div>
+  <div class="uc" data-action="go" data-v="supp"><div class="uc-icon">📍</div><div class="uc-name">Fornecedores</div><div class="uc-sub">Nacional + Online</div></div>`;
+
+  const bons=BO.map(b=>`<a href="${b.url}" target="_blank" class="bc"><div class="bic">${b.icon}</div><div class="bn">${b.name}</div><div class="bd">${b.desc}</div><span class="bl">Acessar →</span></a>`).join('');
+
+  return`
+  <div class="wb">
+    <div class="wg">✦ Bem-vindo ao</div>
+    <div class="wt">Fórmula Auto Pro</div>
+    <div class="wx">Sou João Silva, Engenheiro Químico com mais de 10 anos de experiência em formulação. Este guia foi criado para você produzir com qualidade e vender com confiança.</div>
+  </div>
+  <div class="sl">Seus Produtos</div>
+  <div class="pg">${pcards}</div>
+  <div class="sl">Ferramentas</div>
+  <div class="ug">${utils}</div>
+  <div class="sl">Seus Bônus</div>
+  <div class="bg">${bons}</div>
+  <div style="padding:14px 16px;text-align:center">
+    <button onclick="openInst()" style="background:rgba(232,114,12,.12);border:1px solid rgba(232,114,12,.25);color:var(--acc);padding:10px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;width:100%">📲 Instalar no Celular</button>
+    <div style="margin-top:10px;font-size:11px;color:var(--dim)">João Silva · Engenheiro Químico · (81) 3196-3052</div>
+  </div>`;
+}
+
+// ── AUTO PRO ───────────────────────────────────────────────────────
+function rAuto(){
+  const viewed=AF.filter(f=>isVd(f.id)).length;
+  const cats=AC.map(ch=>{
+    const n=AF.filter(f=>f.cat===ch.id).length;
+    return`<div class="cc" data-action="auto-cat" data-cat="${ch.id}">
+      <span class="ci">${ch.icon}</span>
+      <div class="cn">${ch.name}</div>
+      <div class="ck">${n} fórmulas</div>
+    </div>`;
+  }).join('');
+  return`
+  <div class="sah">
+    <div class="bb" data-action="go" data-v="home">‹</div>
+    <div class="sat"><div class="sat-icon">⚡</div><div class="sat-name">Fórmula Auto Pro</div><div class="sat-sub">${AF.length} fórmulas · ${viewed} visualizadas</div></div>
+  </div>
+  <div class="dl-wrap"><a href="guia-autopro.pdf" download class="dl-btn">📥 Baixar Guia Completo (PDF)</a></div>
+  <div style="padding:0 16px 8px"><div class="sl" style="margin:8px 0 10px">Categorias</div></div>
+  <div class="cg" style="padding:0 16px 16px">${cats}</div>`;
+}
+
+function rAutoCat(){
+  const ch=AC.find(c=>c.id===S.autoCat)||AC[0];
+  const fs=AF.filter(f=>f.cat===S.autoCat);
+  const items=fs.map(f=>`
+  <div class="fi${isFav(f.id)?' sv':''}${isVd(f.id)?' vd':''}" data-action="auto-form" data-id="${f.id}">
+    <div class="fic">
+      <div class="fit">${f.title}</div>
+      <div class="fid">${f.desc}</div>
+    </div>
+    <div class="far">›</div>
+  </div>`).join('');
+  return`
+  <div class="sah">
+    <div class="bb" data-action="go" data-v="auto">‹</div>
+    <div class="sat"><div class="sat-icon">${ch.icon}</div><div class="sat-name">${ch.name}</div><div class="sat-sub">${fs.length} de ${ch.total} fórmulas</div></div>
+  </div>
+  <div class="pb"><div class="pf" id="pf" style="width:0%"></div></div>
+  <div class="fl">${items}</div>`;
+}
+
+// ── LIMPEZA ───────────────────────────────────────────────────────
+function rLimpeza(){
+  if(!S.access.limp&&!S.access.admin)return rLocked('🌿','50 Fórmulas de Limpeza','https://pay.hotmart.com/G106306791H','R$9,90');
+  const viewed=LF.filter(f=>isVd(f.id)).length;
+  const cats=LC.map(ch=>{
+    const n=LF.filter(f=>f.cat===ch.id).length;
+    return`<div class="cc" data-action="limp-cat" data-cat="${ch.id}">
+      <span class="ci">${ch.icon}</span>
+      <div class="cn">Linha ${ch.name}</div>
+      <div class="ck">${n} de ${ch.total} fórmulas</div>
+    </div>`;
+  }).join('');
+  return`
+  <div class="sah">
+    <div class="bb" data-action="go" data-v="home">‹</div>
+    <div class="sat"><div class="sat-icon">🌿</div><div class="sat-name">50 Fórmulas de Limpeza</div><div class="sat-sub">${LF.length} fórmulas · ${viewed} visualizadas</div></div>
+  </div>
+  <div class="dl-wrap"><a href="guia-limpeza.pdf" download class="dl-btn">📥 Baixar Guia Completo (PDF)</a></div>
+  <div style="padding:0 16px 8px"><div class="sl" style="margin:8px 0 10px">Categorias</div></div>
+  <div class="cg" style="padding:0 16px 16px">${cats}</div>`;
+}
+
+function rLimpCat(){
+  const ch=LC.find(c=>c.id===S.limpCat)||LC[0];
+  const fs=LF.filter(f=>f.cat===S.limpCat);
+  const items=fs.map(f=>`
+  <div class="fi${isFav(f.id)?' sv':''}${isVd(f.id)?' vd':''}" data-action="limp-form" data-id="${f.id}">
+    <div class="fic">
+      <div class="fit">${f.title}</div>
+      <div class="fid">${f.desc}</div>
+    </div>
+    <div class="far">›</div>
+  </div>`).join('');
+  return`
+  <div class="sah">
+    <div class="bb" data-action="go" data-v="limpeza">‹</div>
+    <div class="sat"><div class="sat-icon">${ch.icon}</div><div class="sat-name">Linha ${ch.name}</div><div class="sat-sub">${fs.length} de ${ch.total} fórmulas</div></div>
+  </div>
+  <div class="pb"><div class="pf" id="pf" style="width:0%"></div></div>
+  <div class="fl">${items}</div>`;
+}
+
+// ── SHARED FORMULA DETAIL ──────────────────────────────────────────
+function rForm(db,id,backView,backCat,parentView){
+  const f=db.find(x=>x.id===id);
+  if(!f)return rHome();
+  markVd(f.id);
+  const fv=isFav(f.id);
+  const tbl=`<table class="ft"><thead><tr><th>Ingrediente</th><th>Quantidade</th></tr></thead><tbody>${(f.formula||[]).map(([i,q])=>`<tr><td>${i}</td><td>${q}</td></tr>`).join('')}</tbody></table>`;
+  const ift=`<div class="ifl">${(f.ingFunc||[]).map(([n,d])=>`<div class="ifi"><div class="ifn">${n}</div><div class="ifd">${d}</div></div>`).join('')}</div>`;
+  const prep=`<div class="pl">${(f.prep||[]).map((s,i)=>`<div class="ps"><div class="pn">${i+1}</div><div class="ptx">${s}</div></div>`).join('')}</div>`;
+  const dil=`<table class="dt"><thead><tr><th>Situação</th><th>Diluição</th><th>Exemplo</th></tr></thead><tbody>${(f.dil||[]).map(([s,r,e])=>`<tr><td>${s}</td><td><span class="dr">${r}</span></td><td><span class="de">${e}</span></td></tr>`).join('')}</tbody></table>`;
+  const caut=(f.caut||[]).map(c=>`<div class="wi"><div class="wic">⚠️</div><div class="wtx">${c}</div></div>`).join('');
+  const errs=(f.err||[]).map(e=>`<div class="wi"><div class="wic">❌</div><div class="wtx">${e}</div></div>`).join('');
+  return`
+  <div class="fh">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+      <div class="bb" data-action="back-cat" data-view="${backView}" data-cat="${backCat}">‹</div>
+      <div style="flex:1"></div>
+      <div style="font-size:10px;color:var(--dim)">${f.catIcon||''} ${f.catName||''}</div>
+    </div>
+    <div class="ftm">${f.title}</div>
+    <div class="fdm">${f.desc}</div>
+    <button class="fav-btn${fv?' on':''}" data-action="fav" data-id="${f.id}">
+      ${fv?'♥  Salvo nos favoritos':'♡  Salvar nos favoritos'}
+    </button>
+  </div>
+  <div class="sb"><div class="bt">Onde Usar</div><div class="ul2">${(f.uses||[]).map(u=>`<span class="ut2">${u}</span>`).join('')}</div></div>
+  <div class="sb"><div class="bt">Fórmula para 100 Litros</div>${tbl}</div>
+  <div class="sb"><div class="bt">Função dos Ingredientes</div>${ift}</div>
+  <div class="sb"><div class="bt">Modo de Preparo</div>${prep}</div>
+  <div class="sb"><div class="bt">Diluição</div>${dil}</div>
+  ${f.app?`<div class="sb"><div class="bt">Como Aplicar</div><p class="ptx" style="font-size:13px;line-height:1.7;color:var(--mut)">${f.app}</p></div>`:''}
+  ${caut?`<div class="sb"><div class="bt">Cuidados</div><div class="wl">${caut}</div></div>`:''}
+  ${errs?`<div class="sb"><div class="bt">Erros Comuns</div><div class="wl">${errs}</div></div>`:''}
+  <div class="sb"><div class="bt">Fragrância, Cor e Embalagem</div>
+    <div class="ig">
+      ${f.frag?`<div class="ip"><div class="ipl">Fragrâncias</div><div class="ipv">${f.frag}</div></div>`:''}
+      ${f.cor?`<div class="ip"><div class="ipl">Cor</div><div class="ipv">${f.cor}</div></div>`:''}
+      ${f.emb?`<div class="ip" style="grid-column:span 2"><div class="ipl">Embalagem</div><div class="ipv">${f.emb}</div></div>`:''}
+    </div>
+  </div>
+  ${f.venda?`<div class="sb"><div class="bt">Argumento de Venda e Custo</div><div class="sales"><div class="sq">"${f.venda}"</div><div class="cn2">${f.custo||''}</div></div></div>`:''}`;
+}
+
+// ── LEGALIZAÇÃO ────────────────────────────────────────────────────
+function rLegal(){
+  if(!S.access.leg&&!S.access.admin)return rLocked('⚖️','Guia de Legalização','https://pay.hotmart.com/O106306505N','R$9,90');
+  const items=LG.map(cap=>`
+  <div class="lg-card" data-action="leg-cap" data-id="${cap.id}">
+    <div class="lg-num">${cap.num}</div>
+    <div class="lg-body">
+      <div class="lg-title">${cap.icon} ${cap.title}</div>
+      <div class="lg-sub">${cap.desc}</div>
+    </div>
+    <div style="color:var(--dim);font-size:18px;flex-shrink:0">›</div>
+  </div>`).join('');
+  return`
+  <div class="sah">
+    <div class="bb" data-action="go" data-v="home">‹</div>
+    <div class="sat"><div class="sat-icon">⚖️</div><div class="sat-name">Guia de Legalização</div><div class="sat-sub">9 capítulos — venda do jeito certo</div></div>
+  </div>
+  <div class="dl-wrap"><a href="guia-legalizacao.pdf" download class="dl-btn">📥 Baixar Guia Completo (PDF)</a></div>
+  <div class="fl">${items}</div>`;
+}
+
+function rLegalCap(){
+  const cap=LG.find(x=>x.id===S.legCap)||LG[0];
+  const lines=cap.content.split('\n').map(l=>{
+    if(!l.trim())return'<div style="height:6px"></div>';
+    if(l.startsWith('•')||l.startsWith('✅')||l.startsWith('❌')||l.startsWith('☐'))
+      return`<div style="padding:3px 0 3px 4px;font-size:13px;line-height:1.7">${l}</div>`;
+    if(l.match(/^\d+\./)||l.match(/^[A-Z]{2,}/))
+      return`<div style="font-weight:700;font-size:13px;margin-top:8px;margin-bottom:2px;color:var(--txt)">${l}</div>`;
+    return`<p style="font-size:13px;line-height:1.7;color:var(--mut)">${l}</p>`;
+  }).join('');
+  return`
+  <div class="sah">
+    <div class="bb" data-action="go" data-v="legal">‹</div>
+    <div class="sat"><div style="font-size:10px;color:var(--blu);font-weight:700">Capítulo ${cap.num}</div><div class="sat-name" style="font-size:15px">${cap.title}</div></div>
+  </div>
+  <div style="padding:16px">
+    <div style="background:linear-gradient(135deg,var(--card),rgba(59,130,246,.06));border:1px solid var(--brd);border-left:3px solid var(--blu);border-radius:var(--r);padding:14px;margin-bottom:16px">
+      <div style="font-size:10px;color:var(--blu);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">Resumo</div>
+      <div style="font-size:13px;color:var(--mut);line-height:1.6">${cap.desc}</div>
+    </div>
+    ${lines}
+    <div style="margin-top:20px">
+      <a href="guia-legalizacao.pdf" download class="dl-btn">📥 Baixar Guia Completo em PDF</a>
+    </div>
+  </div>`;
+}
+
+// ── EXCLUSIVA ──────────────────────────────────────────────────────
+function rExclusiva(){
+  if(!S.access.form&&!S.access.admin)return rLocked('⚗️','Fórmula Exclusiva','https://pay.hotmart.com/C106306412J','R$19,90');
+  return`
+  <div class="sah">
+    <div class="bb" data-action="go" data-v="home">‹</div>
+    <div class="sat"><div class="sat-icon">⚗️</div><div class="sat-name">Fórmula Exclusiva</div><div class="sat-sub">Fórmulas desenvolvidas para o seu negócio</div></div>
+  </div>
+  <div class="ex-box">
+    <div style="font-size:20px;font-weight:800;margin-bottom:6px;color:var(--txt)">O que você recebe</div>
+    <div style="font-size:13px;color:var(--mut);margin-bottom:16px;line-height:1.6">3 a 5 fórmulas desenvolvidas especialmente para as suas necessidades pelo João Silva, Engenheiro Químico com mais de 10 anos de experiência.</div>
+    <div class="ex-step"><div class="ex-num">1</div><div class="ex-txt"><b>Descreva o produto que você quer</b><br>Nome, finalidade, perfil de cliente, concorrentes e qualquer referência que tenha.</div></div>
+    <div class="ex-step"><div class="ex-num">2</div><div class="ex-txt"><b>Informe o orçamento por litro</b><br>Assim o João vai desenvolver a fórmula dentro da sua realidade de custo.</div></div>
+    <div class="ex-step"><div class="ex-num">3</div><div class="ex-txt"><b>Receba as fórmulas em até 5 dias úteis</b><br>Com ingredientes, modo de preparo, diluição e argumento de venda.</div></div>
+    <div class="ex-step"><div class="ex-num">4</div><div class="ex-txt"><b>Tire dúvidas diretamente com o formulador</b><br>1 rodada de ajustes incluída na compra.</div></div>
+  </div>
+  <div style="padding:0 16px;margin-bottom:8px">
+    <div style="background:var(--card);border:1px solid var(--brd);border-radius:var(--r);padding:14px;margin-bottom:12px">
+      <div style="font-size:10px;color:var(--acc);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">📝 Modelo de Mensagem</div>
+      <div class="ex-msg" style="margin:0;background:var(--bg2);font-family:'Courier New',monospace;font-size:12px;line-height:1.8">Olá João! Comprei a Fórmula Exclusiva.<br><br>Produto desejado: [descreva aqui]<br>Finalidade: [para que serve]<br>Público: [quem vai comprar]<br>Custo por litro desejado: R$ [valor]<br>Observações: [outras informações]</div>
+    </div>
+  </div>
+  <a href="https://wa.me/${WA}?text=Ol%C3%A1+Jo%C3%A3o!+Comprei+a+F%C3%B3rmula+Exclusiva+e+quero+solicitar+minhas+f%C3%B3rmulas." target="_blank" class="wa-btn">
+    💬 Enviar mensagem no WhatsApp
+  </a>
+  <div style="padding:16px;text-align:center;font-size:12px;color:var(--dim)">João Silva — (81) 3196-3052<br>Respondido em até 24h em dias úteis</div>`;
+}
+
+// ── LOCKED STATE ──────────────────────────────────────────────────
+function rLocked(icon,name,url,price){
+  return`
+  <div class="sah">
+    <div class="bb" data-action="go" data-v="home">‹</div>
+    <div class="sat"><div class="sat-icon">${icon}</div><div class="sat-name">${name}</div></div>
+  </div>
+  <div class="es">
+    <div class="ei">🔒</div>
+    <div class="et">Conteúdo Bloqueado</div>
+    <div class="ex2">Adquira ${name} para desbloquear todo o conteúdo.</div>
+    <a href="${url}" target="_blank" style="display:inline-block;margin-top:20px;background:linear-gradient(135deg,var(--acc),var(--acd));color:#fff;padding:13px 28px;border-radius:var(--r);font-size:14px;font-weight:700;text-decoration:none">
+      🔓 Desbloquear por ${price}
+    </a>
+  </div>`;
+}
+
+// ── SEARCH (RTL FIX — never re-render input) ──────────────────────
+function rSearchShell(){
+  return`
+  <div id="search-wrap" style="position:relative;padding:14px 16px;border-bottom:1px solid var(--brd)">
+    <span id="search-icon">🔍</span>
+    <input type="text" id="search-inp" dir="ltr" autocomplete="off" autocorrect="off"
+      autocapitalize="off" spellcheck="false" lang="pt-BR"
+      placeholder="Buscar fórmulas, ingredientes..." 
+      style="direction:ltr;text-align:left;unicode-bidi:embed">
+  </div>
+  <div id="search-results">
+    <div class="es"><div class="ei">🔍</div><div class="et">Digite para buscar</div><div class="ex2">Busque por nome, ingrediente ou categoria</div></div>
+  </div>`;
+}
+function bindSearch(){
+  const inp=$('search-inp');
+  if(!inp)return;
+  inp.focus();
+  // Restore previous search
+  if(S.searchQ){inp.value=S.searchQ;doSearch(S.searchQ);}
+  inp.addEventListener('input',e=>{
+    const q=e.target.value;
+    S.searchQ=q;
+    doSearch(q);
+  });
+  inp.addEventListener('keydown',e=>{
+    // Force cursor to end on each keystroke (RTL fix)
+    requestAnimationFrame(()=>{
+      if(inp.selectionStart!==inp.value.length){
+        // Don't force if user is editing middle of text
+      }
+    });
+  });
+}
+function doSearch(q){
+  const el=$('search-results');
+  if(!el)return;
+  const qn=q.toLowerCase().trim();
+  if(qn.length<2){
+    el.innerHTML='<div class="es"><div class="ei">🔍</div><div class="et">Digite para buscar</div><div class="ex2">Mínimo 2 caracteres</div></div>';
+    return;
+  }
+  const all=[...AF,...LF];
+  const rs=all.filter(f=>
+    f.title.toLowerCase().includes(qn)||
+    f.desc.toLowerCase().includes(qn)||
+    (f.catName||'').toLowerCase().includes(qn)||
+    (f.uses||[]).some(u=>u.toLowerCase().includes(qn))
+  );
+  if(!rs.length){
+    el.innerHTML='<div class="es"><div class="ei">😔</div><div class="et">Nenhum resultado</div><div class="ex2">Tente outros termos</div></div>';
+    return;
+  }
+  el.innerHTML=`<div class="fl">${rs.map(f=>{
+    const isAuto=AF.includes(f);
+    const isLimp=LF.includes(f);const act=isLimp?'limp-form':'auto-form';
+    const catKey=isAuto?'autoCat':'limpCat';
+    return`<div class="fi${isFav(f.id)?' sv':''}" data-action="${act}" data-id="${f.id}" data-cat="${f.cat}">
+      <div class="fic">
+        <div style="font-size:10px;color:var(--acc);margin-bottom:2px;font-weight:700">${f.catIcon||''} ${f.catName||''}</div>
+        <div class="fit">${f.title}</div>
+        <div class="fid">${f.desc}</div>
+      </div>
+      <div class="far">›</div>
+    </div>`;
+  }).join('')}</div>`;
+  bindCommon();
+}
+
+// ── FAVORITES ─────────────────────────────────────────────────────
+function rFavs(){
+  const all=[...AF,...LF];
+  const fs=all.filter(f=>isFav(f.id));
+  if(!fs.length)return`<div class="es"><div class="ei">♡</div><div class="et">Nenhum favorito</div><div class="ex2">Salve as fórmulas que você mais usa para acessar rapidamente.</div></div>`;
+  return`
+  <div style="padding:12px 16px 4px;font-size:12px;color:var(--mut)">${fs.length} fórmula${fs.length!==1?'s':''} salva${fs.length!==1?'s':''}</div>
+  <div class="fl">${fs.map(f=>{
+    const isAuto=AF.includes(f);
+    const isLimp=LF.includes(f);const act=isLimp?'limp-form':'auto-form';
+    return`<div class="fi sv" data-action="${act}" data-id="${f.id}" data-cat="${f.cat}">
+      <div class="fic">
+        <div style="font-size:10px;color:var(--acc);margin-bottom:2px;font-weight:700">${f.catIcon||''} ${f.catName||''}</div>
+        <div class="fit">${f.title}</div>
+        <div class="fid">${f.desc}</div>
+      </div>
+      <div class="far">›</div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+// ── GLOSSARY ──────────────────────────────────────────────────────
+function rGloss(){
+  return`
+  <div class="sah">
+    <div class="bb" data-action="go" data-v="home">‹</div>
+    <div class="sat"><div class="sat-icon">📚</div><div class="sat-name">Glossário de Insumos</div><div class="sat-sub">${GL.length} ingredientes com função e preço</div></div>
+  </div>
+  <div class="gs"><input type="text" id="gi" dir="ltr" autocomplete="off" placeholder="Filtrar ingredientes..."></div>
+  <div class="gw"><table class="gt"><thead><tr><th>Insumo</th><th>Uso</th><th>Função Principal</th><th>Substituto</th><th>Preço</th></tr></thead><tbody id="gb">
+  ${GL.map(([n,u,fn,sub,p])=>`<tr><td><div class="gn">${n}</div></td><td class="gm">${u}</td><td class="gm">${fn}</td><td class="gm">${sub}</td><td class="gp">${p}</td></tr>`).join('')}
+  </tbody></table></div>`;
+}
+
+// ── SUPPLIERS ─────────────────────────────────────────────────────
+function rSupp(){
+  let h=`<div class="sah"><div class="bb" data-action="go" data-v="home">‹</div><div class="sat"><div class="sat-icon">📍</div><div class="sat-name">Fornecedores</div><div class="sat-sub">Nacional + Marketplaces + Online</div></div></div>`;
+  for(const[r,s] of Object.entries(SU)){
+    h+=`<div class="sr">${r}</div>`;
+    for(const[n,c,co] of s)h+=`<div class="sc"><div class="sn">${n}</div><div class="sct">📍 ${c}</div><div class="sco">${co}</div></div>`;
+  }
+  return h;
+}
+
+// ── EVENT BINDING ──────────────────────────────────────────────────
+function bindCommon(){
+  document.querySelectorAll('[data-action]').forEach(el=>{
+    // Avoid double-binding
+    if(el._bound)return;
+    el._bound=true;
+    el.addEventListener('click',handleClick);
+  });
+  const gi=$('gi');
+  if(gi)gi.addEventListener('input',e=>{
+    const q=e.target.value.toLowerCase();
+    document.querySelectorAll('#gb tr').forEach(r=>{
+      r.style.display=r.textContent.toLowerCase().includes(q)?'':'none';
+    });
+  });
+}
+
+function handleClick(e){
+  const el=e.currentTarget,ac=el.dataset.action;
+  switch(ac){
+    case'go': go(el.dataset.v);break;
+    case'upsell': {
+      const urls={base:'',limp:'https://pay.hotmart.com/G106306791H',leg:'https://pay.hotmart.com/O106306505N',form:'https://pay.hotmart.com/C106306412J'};
+      const v=el.dataset.v;const key=el.dataset.key;
+      if(key&&!S.access[key]&&urls[key])window.open(urls[key],'_blank');
+      break;
+    }
+    case'auto-cat': go('auto-cat',{autoCat:el.dataset.cat});break;
+    case'auto-form': go('auto-form',{autoForm:el.dataset.id,autoCat:el.dataset.cat||S.autoCat});break;
+    case'limp-cat': go('limp-cat',{limpCat:el.dataset.cat});break;
+    case'limp-form': go('limp-form',{limpForm:el.dataset.id,limpCat:el.dataset.cat||S.limpCat});break;
+    case'leg-cap': go('legal-cap',{legCap:el.dataset.id});break;
+    case'back-cat': go(el.dataset.view,{autoCat:el.dataset.cat,limpCat:el.dataset.cat});break;
+    case'fav': togFav(el.dataset.id,e);break;
+    case'ip-tab': S.instTab=el.dataset.tab;renderInstTabs();break;
+  }
+}
+
+// ── INSTALL PROMPT ─────────────────────────────────────────────────
+function openInst(){$('ip').classList.add('open');renderInstTabs();}
+function closeInst(){$('ip').classList.remove('open');}
+function renderInstTabs(){
+  const ios=S.instTab==='ios';
+  const steps=ios?[
+    'Abra este link no <b>Safari</b> (obrigatório no iPhone)',
+    'Toque no ícone <b>⬆</b> na barra inferior',
+    'Toque em <b>"Adicionar à Tela de Início"</b>',
+    'Confirme com <b>Adicionar</b> — ícone aparece na tela!',
+  ]:[
+    'Abra este link no <b>Google Chrome</b>',
+    'Toque nos 3 pontos <b>⋮</b> no canto superior',
+    'Toque em <b>"Instalar aplicativo"</b>',
+    'Confirme com <b>Instalar</b> — ícone aparece na tela!',
+  ];
+  const box=$('ip-box');
+  if(!box)return;
+  box.innerHTML=`
+  <div class="ip-title">📲 Instalar no Celular</div>
+  <div class="ip-sub">Acesse offline, sem internet, igual a um app</div>
+  <div class="ip-tabs">
+    <div class="ip-tab${ios?' on':''}" data-action="ip-tab" data-tab="ios">🍎 iPhone</div>
+    <div class="ip-tab${!ios?' on':''}" data-action="ip-tab" data-tab="and">🤖 Android</div>
+  </div>
+  <div class="ip-steps">${steps.map((s,i)=>`<div class="ip-step"><div class="ip-n">${i+1}</div><div class="ip-t">${s}</div></div>`).join('')}</div>
+  <button class="ip-close" onclick="closeInst()">Entendi ✓</button>`;
+  document.querySelectorAll('[data-action="ip-tab"]').forEach(el=>{
+    el._bound=false;el.addEventListener('click',handleClick);
+  });
+}
+
+let dP=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();dP=e;});
+
+// ── INIT ──────────────────────────────────────────────────────────
+
+
+
 
 function init(){
   S.access=parseAccess();
