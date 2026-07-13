@@ -315,28 +315,22 @@ function _showLogin(){
   if(sp)sp.style.display='none';
   const el=document.createElement('div');
   el.id='fap-login';
-  el.innerHTML=\`
-    <div style="min-height:100vh;background:#080B0F;display:flex;align-items:center;justify-content:center;padding:24px;font-family:system-ui,sans-serif">
-      <div style="background:#111418;border:1px solid #21262D;border-radius:20px;padding:32px 24px;max-width:360px;width:100%;text-align:center">
-        <div style="font-size:52px;margin-bottom:12px">⚡</div>
-        <h1 style="font-size:22px;font-weight:800;color:#F0F6FC;margin-bottom:8px">Fórmula Auto Pro</h1>
-        <p style="font-size:14px;color:#8B949E;margin-bottom:24px;line-height:1.6">Digite o email que você usou na compra para acessar</p>
-        <input id="fap-email-input" type="email" placeholder="seu@email.com" autocomplete="email"
-          style="width:100%;padding:14px;border-radius:10px;border:1px solid #21262D;background:#0D1117;color:#F0F6FC;font-size:15px;margin-bottom:12px;outline:none;-webkit-appearance:none"/>
-        <button onclick="_doLogin()"
-          style="width:100%;padding:16px;border-radius:12px;background:linear-gradient(135deg,#E8720C,#C45E08);color:#fff;font-size:15px;font-weight:700;border:none;cursor:pointer;margin-bottom:8px">
-          Acessar →
-        </button>
-        <p id="fap-login-err" style="font-size:12px;color:#F85149;margin-top:8px;display:none;min-height:18px"></p>
-        <p style="font-size:11px;color:#484F58;margin-top:20px">
-          Problemas? <a href="https://wa.me/558131963052" style="color:#E8720C;text-decoration:none">Fale com o suporte</a>
-        </p>
-      </div>
-    </div>
-  \`;
+  el.innerHTML='<div style="min-height:100vh;background:#080B0F;display:flex;align-items:center;justify-content:center;padding:24px;font-family:system-ui,sans-serif">'
+    +'<div style="background:#111418;border:1px solid #21262D;border-radius:20px;padding:32px 24px;max-width:360px;width:100%;text-align:center">'
+    +'<div style="font-size:52px;margin-bottom:12px">⚡</div>'
+    +'<h1 style="font-size:22px;font-weight:800;color:#F0F6FC;margin-bottom:8px">Fórmula Auto Pro</h1>'
+    +'<p style="font-size:14px;color:#8B949E;margin-bottom:24px;line-height:1.6">Digite o email que você usou na compra</p>'
+    +'<input id="fap-email-input" type="email" placeholder="seu@email.com" autocomplete="email"'
+    +' style="width:100%;padding:14px;border-radius:10px;border:1px solid #21262D;background:#0D1117;color:#F0F6FC;font-size:15px;margin-bottom:12px;outline:none"/>'
+    +'<button onclick="_doLogin()" style="width:100%;padding:16px;border-radius:12px;background:linear-gradient(135deg,#E8720C,#C45E08);color:#fff;font-size:15px;font-weight:700;border:none;cursor:pointer;margin-bottom:8px">Acessar →</button>'
+    +'<p id="fap-login-err" style="font-size:12px;color:#F85149;margin-top:8px;display:none;min-height:18px"></p>'
+    +'<p style="font-size:11px;color:#484F58;margin-top:20px">Problemas? <a href="https://wa.me/558131963052" style="color:#E8720C;text-decoration:none">Fale com o suporte</a></p>'
+    +'</div></div>';
   document.body.appendChild(el);
-  setTimeout(()=>document.getElementById('fap-email-input')?.focus(),300);
+  setTimeout(function(){var i=document.getElementById('fap-email-input');if(i)i.focus();},300);
 }
+
+async function _doLogin
 
 async function _doLogin(){
   const input=document.getElementById('fap-email-input');
