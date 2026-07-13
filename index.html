@@ -276,15 +276,15 @@ function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
 
 
 function parseAccess(){
-  const p=new URLSearchParams(location.search);
-  const raw=p.get('t')||p.get('access')||'';
-  if(raw) localStorage.setItem('fap_token',raw);
-  const t=(raw||localStorage.getItem('fap_token')||'').toUpperCase();
-  const admin=t==='ADMIN_FAP_2024'||t.includes('FULL');
-  return{base:t.length>0||admin,limp:t.includes('LIMP')||admin,leg:t.includes('LEG')||admin,form:t.includes('FORM')||admin,full:admin,admin};
+  // Admin bypass via URL
+  const t=(new URLSearchParams(location.search).get('t')||'').toUpperCase();
+  if(t==='ADMIN_FAP_2024'||t.includes('FULL'))
+    return{base:true,limp:true,leg:true,form:true,full:true,admin:true};
+  // Permissões vêm do S.perms (carregado após login por email)
+  return S&&S.perms?S.perms:{base:false,limp:false,leg:false,form:false,full:false,admin:false};
 }
 
-let S={
+let S={perms:null,
   view:'home',
   // navigation state
   autoCat:null, autoForm:null,
@@ -810,23 +810,103 @@ window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();dP=e;});
 
 
 
-function init(){
+// ── Login por email ───────────────────────────────────────────────
+function _fapShowLogin(errMsg){
+  const sp=$('splash'); if(sp)sp.style.display='none';
+  if($('fap-login'))return;
+  const el=document.createElement('div'); el.id='fap-login';
+  el.innerHTML='<div style="min-height:100vh;background:#080B0F;display:flex;align-items:center;justify-content:center;padding:24px;font-family:system-ui,sans-serif">'
+    +'<div style="background:#111418;border:1px solid #21262D;border-radius:20px;padding:32px 24px;max-width:360px;width:100%;text-align:center">'
+    +'<div style="font-size:48px;margin-bottom:12px">⚡</div>'
+    +'<h1 style="font-size:22px;font-weight:800;color:#F0F6FC;margin-bottom:8px">Fórmula Auto Pro</h1>'
+    +'<p style="font-size:14px;color:#8B949E;margin-bottom:24px;line-height:1.6">Digite o email que você usou na compra</p>'
+    +'<input id="fap-ei" type="email" placeholder="seu@email.com" autocomplete="email"'
+    +' style="width:100%;padding:14px;border-radius:10px;border:1px solid #21262D;background:#0D1117;color:#F0F6FC;font-size:15px;margin-bottom:12px;outline:none;-webkit-appearance:none"/>'
+    +'<button id="fap-eb" onclick="_fapDoLogin()"'
+    +' style="width:100%;padding:16px;border-radius:12px;background:linear-gradient(135deg,#E8720C,#C45E08);color:#fff;font-size:15px;font-weight:700;border:none;cursor:pointer">Acessar →</button>'
+    +'<p id="fap-ee" style="font-size:12px;color:#F85149;margin-top:10px;min-height:18px"></p>'
+    +'<p style="font-size:11px;color:#484F58;margin-top:20px">Problemas? <a href="https://wa.me/558131963052" style="color:#E8720C;text-decoration:none">Fale com o suporte</a></p>'
+    +'</div></div>';
+  document.body.appendChild(el);
+  if(errMsg){var ee=$('fap-ee');if(ee)ee.textContent=errMsg;}
+  setTimeout(function(){var i=$('fap-ei');if(i)i.focus();},300);
+}
+
+function _fapLoadApp(perms){
+  S.perms=perms;
   S.access=parseAccess();
+  var el=$('fap-login'); if(el)el.remove();
+  var ap=$('app'); if(ap)ap.removeAttribute('hidden');
+  render();
+  var standalone=window.matchMedia('(display-mode:standalone)').matches||navigator.standalone;
+  if(!standalone&&!localStorage.getItem('fap_inst_shown')){
+    setTimeout(openInst,1500);
+    localStorage.setItem('fap_inst_shown','1');
+  }
+}
+
+async function _fapDoLogin(){
+  var btn=$('fap-eb'), ee=$('fap-ee'), ei=$('fap-ei');
+  var email=(ei?ei.value:'').trim().toLowerCase();
+  if(!email){if(ee)ee.textContent='Digite seu email';return;}
+  if(btn){btn.textContent='Verificando...';btn.disabled=true;}
+  if(ee)ee.textContent='';
+  try{
+    var r=await fetch('/api/login?email='+encodeURIComponent(email),{cache:'no-store'});
+    var d=await r.json();
+    if(d.success){
+      localStorage.setItem('fap_email',email);
+      _fapLoadApp(d.permissions);
+    }else{
+      if(ee)ee.textContent=d.error||'Email não encontrado';
+      if(btn){btn.textContent='Acessar →';btn.disabled=false;}
+    }
+  }catch(e){
+    if(ee)ee.textContent='Erro de conexão. Tente novamente.';
+    if(btn){btn.textContent='Acessar →';btn.disabled=false;}
+  }
+}
+
+function init(){
+  // Admin bypass via URL — entra direto sem login
+  const urlT=(new URLSearchParams(location.search).get('t')||'').toUpperCase();
+  if(urlT==='ADMIN_FAP_2024'||urlT.includes('FULL')){
+    S.perms={base:true,limp:true,leg:true,form:true};
+  }
+
   setTimeout(()=>{
-    const sp=$('splash'),ap=$('app');
+    const sp=$('splash');
     if(sp){sp.style.opacity='0';sp.style.transition='opacity .5s';}
-    setTimeout(()=>{
+    setTimeout(async ()=>{
       if(sp)sp.style.display='none';
-      if(ap)ap.removeAttribute('hidden');
-      render();
-      const standalone=window.matchMedia('(display-mode:standalone)').matches||navigator.standalone;
-      if(!standalone&&!localStorage.getItem('fap_inst_shown')){
-        setTimeout(openInst,1500);
-        localStorage.setItem('fap_inst_shown','1');
+
+      // Admin — entra direto
+      if(S.perms){S.access=parseAccess();const ap=$('app');if(ap)ap.removeAttribute('hidden');render();return;}
+
+      // Verificar email salvo
+      const savedEmail=localStorage.getItem('fap_email');
+      if(savedEmail){
+        try{
+          const r=await fetch('/api/login?email='+encodeURIComponent(savedEmail),{cache:'no-store'});
+          const d=await r.json();
+          if(d.success){_fapLoadApp(d.permissions);return;}
+          // Acesso revogado
+          localStorage.removeItem('fap_email');
+          _fapShowLogin('Seu acesso foi encerrado. Entre em contato com o suporte.');
+          return;
+        }catch(e){
+          // Erro de rede — mostra login
+          _fapShowLogin('Erro de conexão. Verifique sua internet.');
+          return;
+        }
       }
+
+      // Sem email salvo — mostra tela de login
+      _fapShowLogin();
     },520);
   },2000);
-  document.querySelectorAll('.ni').forEach(el=>{
+}
+document.querySelectorAll('.ni').forEach(el=>{
     el.addEventListener('click',()=>{const v=el.dataset.v;if(v)go(v);});
   });
   $('hdr-logo')?.addEventListener('click',()=>go('home'));
