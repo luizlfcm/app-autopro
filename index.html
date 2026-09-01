@@ -59,7 +59,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-seri
 .pc::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--glo),transparent 60%);opacity:0;transition:opacity .25s;}
 .pc:hover{border-color:var(--acc);transform:translateY(-1px);box-shadow:0 0 24px var(--glo);}
 .pc:hover::before{opacity:1;}
-.pc.lk{opacity:.55;}
+.pc.lk{opacity:.85;}
 .pc.lk:hover{transform:none;border-color:var(--brd);}
 .pc-icon{font-size:32px;flex-shrink:0;}
 .pc-body{flex:1;min-width:0;}
@@ -67,7 +67,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-seri
 .pc-sub{font-size:12px;color:var(--mut);line-height:1.4;}
 .pc-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;flex-shrink:0;}
 .pc-badge.inc{background:var(--acc);color:#fff;}
-.pc-badge.lk2{background:var(--brd);color:var(--dim);}
+.pc-badge.lk2{background:var(--glo);color:var(--acl);border:1px solid var(--acc);animation:pulse 2.2s ease-in-out infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(232,114,12,.35);}50%{box-shadow:0 0 0 4px rgba(232,114,12,0);}}
+.pc-hint{color:var(--acl);font-size:10.5px;font-weight:700;margin-top:6px;}
 .pc-badge.unl{background:rgba(34,197,94,.2);color:var(--grn);border:1px solid rgba(34,197,94,.3);}
 /* UTILITY CARDS */
 .ug{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px;}
@@ -279,7 +281,7 @@ function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
 function _fapShowLogin(msg){
   if(document.getElementById('fap-login'))return;
   var el=document.createElement('div');el.id='fap-login';
-  el.innerHTML='<div style="min-height:100vh;background:#080B0F;display:flex;align-items:center;justify-content:center;padding:24px;font-family:system-ui,sans-serif">'
+  el.innerHTML='<div style="position:fixed;inset:0;overflow-y:auto;background:#080B0F;display:flex;align-items:center;justify-content:center;padding:24px;font-family:system-ui,sans-serif;z-index:10000">'
     +'<div style="background:#111418;border:1px solid #21262D;border-radius:20px;padding:32px 24px;max-width:360px;width:100%;text-align:center">'
     +'<div style="font-size:48px;margin-bottom:12px">⚡</div>'
     +'<h1 style="font-size:22px;font-weight:800;color:#F0F6FC;margin-bottom:8px">Fórmula Auto Pro</h1>'
@@ -425,10 +427,10 @@ function rHome(){
   const A=S.access;
   const badge=(unlocked,locked)=>unlocked
     ?'<span class="pc-badge unl">✓ INCLUSO</span>'
-    :'<span class="pc-badge lk2">🔒 BLOQUEADO</span>';
+    :'<span class="pc-badge lk2">🔓 DESBLOQUEAR</span>';
 
   const products=[
-    {icon:'⚡',name:'Fórmula Auto Pro',sub:'80 fórmulas automotivas profissionais',v:'auto',key:'base',always:true},
+    {icon:'⚡',name:'Fórmula Auto Pro',sub:'80 fórmulas automotivas profissionais',v:'auto',key:'base'},
     {icon:'🌿',name:'50 Fórmulas de Limpeza',sub:'Dobre seu catálogo. Venda amaciante, detergente, desinfetante e muito mais.',v:'limpeza',key:'limp'},
     {icon:'⚖️',name:'Guia de Legalização',sub:'Venda sem medo. Tudo o que você precisa para estar na lei.',v:'legal',key:'leg'},
     {icon:'⚗️',name:'Fórmula Exclusiva',sub:'Um Engenheiro Químico desenvolvendo sua fórmula. Exclusiva. Só sua.',v:'exclusiva',key:'form'},
@@ -441,6 +443,7 @@ function rHome(){
       <div class="pc-body">
         <div class="pc-name">${p.name}</div>
         <div class="pc-sub">${p.sub}</div>
+        ${unl?'':'<div class="pc-hint">👆 Toque para comprar e liberar na hora</div>'}
       </div>
       ${badge(unl)}
     </div>`;
@@ -472,6 +475,7 @@ function rHome(){
 
 // ── AUTO PRO ───────────────────────────────────────────────────────
 function rAuto(){
+  if(!S.access.base&&!S.access.admin)return rLocked('⚡','Fórmula Auto Pro','https://pay.hotmart.com/T106306252O?checkoutMode=10','R$39,00');
   const viewed=AF.filter(f=>isVd(f.id)).length;
   const cats=AC.map(ch=>{
     const n=AF.filter(f=>f.cat===ch.id).length;
@@ -824,7 +828,7 @@ function handleClick(e){
   switch(ac){
     case'go': go(el.dataset.v);break;
     case'upsell': {
-      const urls={base:'',limp:'https://pay.hotmart.com/G106306791H',leg:'https://pay.hotmart.com/O106306505N',form:'https://pay.hotmart.com/C106306412J'};
+      const urls={base:'https://pay.hotmart.com/T106306252O?checkoutMode=10',limp:'https://pay.hotmart.com/G106306791H',leg:'https://pay.hotmart.com/O106306505N',form:'https://pay.hotmart.com/C106306412J'};
       const v=el.dataset.v;const key=el.dataset.key;
       if(key&&!S.access[key]&&urls[key])window.open(urls[key],'_blank');
       break;
@@ -836,17 +840,75 @@ function handleClick(e){
     case'leg-cap': go('legal-cap',{legCap:el.dataset.id});break;
     case'back-cat': go(el.dataset.view,{autoCat:el.dataset.cat,limpCat:el.dataset.cat});break;
     case'fav': togFav(el.dataset.id,e);break;
-    case'ip-tab': S.instTab=el.dataset.tab;renderInstTabs();break;
+    case'ip-tab': S.instTab=el.dataset.tab;S._instTabManual=true;renderInstTabs();break;
   }
 }
 
 // ── INSTALL PROMPT ─────────────────────────────────────────────────
-function openInst(){$('ip').classList.add('open');renderInstTabs();}
+function openInst(){
+  // Detecta o sistema automaticamente pra já abrir na aba certa
+  if(!S._instTabManual){
+    const ua=navigator.userAgent||'';
+    S.instTab=/Android/i.test(ua)?'and':'ios';
+  }
+  $('ip').classList.add('open');renderInstTabs();
+}
 function closeInst(){$('ip').classList.remove('open');}
+
+async function installNativo(){
+  if(!dP)return;
+  dP.prompt();
+  const escolha=await dP.userChoice;
+  if(escolha.outcome==='accepted'){
+    closeInst();
+  }
+  dP=null;
+}
+
+function detectaNavegadorApp(){
+  const ua=navigator.userAgent||'';
+  const isInstagram=/Instagram/i.test(ua);
+  const isFacebook=/FBAN|FBAV|FB_IAB/i.test(ua);
+  const isWhatsApp=/WhatsApp/i.test(ua);
+  const isLine=/Line\//i.test(ua);
+  const isTikTok=/TikTok|BytedanceWebview/i.test(ua);
+  if(isInstagram)return'Instagram';
+  if(isFacebook)return'Facebook';
+  if(isWhatsApp)return'WhatsApp';
+  if(isTikTok)return'TikTok';
+  if(isLine)return'Line';
+  return null;
+}
+
 function renderInstTabs(){
+  const box=$('ip-box');
+  if(!box)return;
+
+  // Se o navegador oferece instalação nativa (Android/Chrome/Edge), mostra botão de 1 toque
+  if(dP){
+    box.innerHTML=`
+    <div class="ip-title">📲 Instalar no Celular</div>
+    <div class="ip-sub">Acesse offline, sem internet, igual a um app</div>
+    <div style="text-align:center;padding:24px 0 8px">
+      <div style="font-size:44px;margin-bottom:14px">⚡</div>
+      <p style="font-size:13px;color:var(--mut);margin-bottom:18px">Seu navegador já suporta instalação com 1 toque.</p>
+    </div>
+    <button class="ip-close" style="background:linear-gradient(135deg,var(--acc),var(--acd));color:#fff;border:none;font-weight:700;margin-bottom:10px" onclick="installNativo()">📲 Instalar Agora</button>
+    <button class="ip-close" onclick="closeInst()">Agora não</button>`;
+    return;
+  }
+
+  // Sem prompt nativo disponível — mostra passo a passo (obrigatório no iPhone/Safari)
   const ios=S.instTab==='ios';
+  const appDetectado=detectaNavegadorApp();
+  const avisoAppInterno=(ios&&appDetectado)?`
+    <div style="background:rgba(232,114,12,.12);border:1px solid var(--acc);border-radius:10px;padding:12px 14px;margin-bottom:16px;text-align:left">
+      <div style="font-size:12px;font-weight:800;color:var(--acl);margin-bottom:6px">⚠️ Você está no navegador do ${appDetectado}</div>
+      <div style="font-size:12px;color:var(--txt);line-height:1.5">O ${appDetectado} não permite instalar apps. Toque nos <b>●●●</b> ou <b>⋯</b> (menu, geralmente no canto superior direito) e escolha <b>"Abrir no Safari"</b> ou <b>"Abrir no navegador"</b> antes de continuar.</div>
+    </div>
+  `:'';
   const steps=ios?[
-    'Abra este link no <b>Safari</b> (obrigatório no iPhone)',
+    'Confirme que está usando o <b>Safari</b> (obrigatório no iPhone — não funciona no navegador do WhatsApp/Instagram)',
     'Toque no ícone <b>⬆</b> na barra inferior',
     'Toque em <b>"Adicionar à Tela de Início"</b>',
     'Confirme com <b>Adicionar</b> — ícone aparece na tela!',
@@ -856,8 +918,6 @@ function renderInstTabs(){
     'Toque em <b>"Instalar aplicativo"</b>',
     'Confirme com <b>Instalar</b> — ícone aparece na tela!',
   ];
-  const box=$('ip-box');
-  if(!box)return;
   box.innerHTML=`
   <div class="ip-title">📲 Instalar no Celular</div>
   <div class="ip-sub">Acesse offline, sem internet, igual a um app</div>
@@ -865,6 +925,7 @@ function renderInstTabs(){
     <div class="ip-tab${ios?' on':''}" data-action="ip-tab" data-tab="ios">🍎 iPhone</div>
     <div class="ip-tab${!ios?' on':''}" data-action="ip-tab" data-tab="and">🤖 Android</div>
   </div>
+  ${avisoAppInterno}
   <div class="ip-steps">${steps.map((s,i)=>`<div class="ip-step"><div class="ip-n">${i+1}</div><div class="ip-t">${s}</div></div>`).join('')}</div>
   <button class="ip-close" onclick="closeInst()">Entendi ✓</button>`;
   document.querySelectorAll('[data-action="ip-tab"]').forEach(el=>{
@@ -873,7 +934,12 @@ function renderInstTabs(){
 }
 
 let dP=null;
-window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();dP=e;});
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();
+  dP=e;
+  if($('ip')&&$('ip').classList.contains('open'))renderInstTabs();
+});
+window.addEventListener('appinstalled',()=>{dP=null;});
 
 // ── INIT ──────────────────────────────────────────────────────────
 
