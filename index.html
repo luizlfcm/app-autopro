@@ -408,9 +408,9 @@ let S={
   preview:localStorage.getItem('fap_preview')==='1',
 };
 
-// 2-3 fórmulas completas liberadas no Modo Prévia para quem ainda não comprou
-// (escolhidas em categorias diferentes, só receitas de entrada — linha pesada fica bloqueada)
-const PREVIEW_IDS=['f001','f012','f017'];
+// 1 fórmula completa liberada por categoria no Modo Prévia para quem ainda não comprou
+// (sempre a receita de entrada de cada categoria, pra dar uma amostra de tudo sem entregar o avançado)
+const PREVIEW_IDS=['f001','f007','f012','f017','f022'];
 const CHECKOUT_URLS={base:'https://pay.hotmart.com/T106306252O?off=590ipem5&checkoutMode=10',limp:'https://pay.hotmart.com/G106306791H',leg:'https://pay.hotmart.com/O106306505N',form:'https://pay.hotmart.com/C106306412J'};
 const CHECKOUT_BASE=CHECKOUT_URLS.base;
 const PDF_NAMES={base:'Formula-Auto-Pro-80-Formulas.pdf',limp:'50-Formulas-de-Limpeza.pdf',leg:'Guia-de-Legalizacao.pdf'};
