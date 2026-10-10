@@ -415,7 +415,7 @@ let S={
 // 1 fórmula completa liberada por categoria no Modo Prévia para quem ainda não comprou
 // (sempre a receita de entrada de cada categoria, pra dar uma amostra de tudo sem entregar o avançado)
 const PREVIEW_IDS=['f001','f007','f012','f017','f022'];
-const CHECKOUT_URLS={base:'https://pay.hotmart.com/T106306252O?off=590ipem5&checkoutMode=10',limp:'https://pay.hotmart.com/G106306791H',leg:'https://pay.hotmart.com/O106306505N',form:'https://pay.hotmart.com/C106306412J'};
+const CHECKOUT_URLS={base:'https://pagamento.luverisgroup.com.br/ap?utm_source=app&utm_medium=preview&utm_content=base',limp:'https://pagamento.luverisgroup.com.br/ap/limp?utm_source=app&utm_medium=upsell&utm_content=limp',leg:'https://pagamento.luverisgroup.com.br/ap/leg?utm_source=app&utm_medium=upsell&utm_content=leg',form:'https://pagamento.luverisgroup.com.br/ap/form?utm_source=app&utm_medium=upsell&utm_content=form'};
 const CHECKOUT_BASE=CHECKOUT_URLS.base;
 const PDF_NAMES={base:'Formula-Auto-Pro-80-Formulas.pdf',limp:'50-Formulas-de-Limpeza.pdf',leg:'Guia-de-Legalizacao.pdf'};
 
@@ -600,7 +600,7 @@ function rAutoCat(){
 
 // ── LIMPEZA ───────────────────────────────────────────────────────
 function rLimpeza(){
-  if(!S.access.limp&&!S.access.admin)return rLocked('🌿','50 Fórmulas de Limpeza',CHECKOUT_URLS.limp,'R$9,90','limp');
+  if(!S.access.limp&&!S.access.admin)return rLocked('🌿','50 Fórmulas de Limpeza',CHECKOUT_URLS.limp,'R$13,90','limp');
   const viewed=LF.filter(f=>isVd(f.id)).length;
   const cats=LC.map(ch=>{
     const n=LF.filter(f=>f.cat===ch.id).length;
@@ -716,7 +716,7 @@ function rForm(db,id,backView,backCat,parentView){
 
 // ── LEGALIZAÇÃO ────────────────────────────────────────────────────
 function rLegal(){
-  if(!S.access.leg&&!S.access.admin)return rLocked('⚖️','Guia de Legalização',CHECKOUT_URLS.leg,'R$9,90','leg');
+  if(!S.access.leg&&!S.access.admin)return rLocked('⚖️','Guia de Legalização',CHECKOUT_URLS.leg,'R$13,90','leg');
   const items=LG.map(cap=>`
   <div class="lg-card" data-action="leg-cap" data-id="${cap.id}">
     <div class="lg-num">${cap.num}</div>
@@ -764,7 +764,7 @@ function rLegalCap(){
 
 // ── EXCLUSIVA ──────────────────────────────────────────────────────
 function rExclusiva(){
-  if(!S.access.form&&!S.access.admin)return rLocked('⚗️','Fórmula Exclusiva',CHECKOUT_URLS.form,'R$19,90','form');
+  if(!S.access.form&&!S.access.admin)return rLocked('⚗️','Fórmula Exclusiva',CHECKOUT_URLS.form,'R$24,90','form');
   return`
   <div class="sah">
     <div class="bb" data-action="go" data-v="home">‹</div>
