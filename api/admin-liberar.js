@@ -7,7 +7,7 @@ import { randomBytes, timingSafeEqual } from 'crypto';
 // Duas versões no mesmo painel: Completa (padrão) e Essencial (body.versao === 'essencial').
 const CFG = {
   completa: { prefixo: 'cliente:', token: 'FAP_', produtos: ["base", "limp", "leg", "form"] },
-  essencial: { prefixo: 'apess:', token: 'APE_', produtos: ["base", "limp", "leg", "upg"] },
+  essencial: { prefixo: 'apess:', token: 'APE_', produtos: ["base", "limp", "leg", "form", "upg"] },
 };
 const UPSTASH_DEFAULT_URL = 'https://brave-squid-149229.upstash.io';
 
