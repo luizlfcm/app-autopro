@@ -1,3 +1,9 @@
+function primeiroNome(n) {
+  const t = String(n || '').trim().split(/\s+/)[0] || '';
+  if (!/^[A-Za-zÀ-ÿ]{2,20}$/.test(t) || /^cliente$/i.test(t)) return '';
+  return t.charAt(0).toUpperCase() + t.slice(1).toLowerCase();
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Cache-Control', 'no-store');
@@ -42,7 +48,8 @@ export default async function handler(req, res) {
         limp: cliente.limp || false,
         leg:  cliente.leg  || false,
         form: cliente.form || false
-      }
+      },
+      nome: primeiroNome(cliente.nome)
     });
 
   } catch (e) {
